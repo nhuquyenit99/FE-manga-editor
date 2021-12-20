@@ -21,6 +21,7 @@
         "react"
     ],
     "rules": {
+        "@typescript-eslint/no-redeclare": "off",
         "@typescript-eslint/explicit-member-accessibility": 0,
         "@typescript-eslint/camelcase": 0,
         "@typescript-eslint/explicit-function-return-type": [
@@ -31,12 +32,12 @@
         ],
         "indent": [
             "warn",
-            4,
-            {
-                "SwitchCase": 0
-            }
+            4
         ],
-        "linebreak-style": 0,
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
         "quotes": [
             "error",
             "single"

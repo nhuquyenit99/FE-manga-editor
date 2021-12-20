@@ -1,1 +1,1 @@
-export { Demo } from './image-editor';
+export { CropperImagePanel } from './cropper';
