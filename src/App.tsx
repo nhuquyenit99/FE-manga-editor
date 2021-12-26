@@ -1,11 +1,11 @@
 import React from 'react';
-import { CropperImagePanel } from './components';
+import { CropperImagePanel, InsertTextPanel } from './components';
 import './App.scss';
 
 function App() {
     return (
         <div>
-            <CropperImagePanel />
+            <InsertTextPanel />
         </div>
     );
 }

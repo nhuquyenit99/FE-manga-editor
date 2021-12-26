@@ -1,0 +1,85 @@
+.insert-text-panel-wrapper {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #333;
+    overflow: hidden;
+    .header {
+        height: 50px;
+        background: #666;
+        color: white;
+        width: 100%;
+        display: flex;
+        // justify-content: space-between;
+        padding: 10px 15px;
+        align-items: center;
+        .title {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.5rem;
+            font-family: 'Jolly Lodger';
+        }
+    }
+    .insert-text-panel {
+        flex: 1;
+        display: flex;
+        height: calc(100vh - 50px);
+        .tool-menu {
+            height: 100%;
+            width: 400px;
+            background-color: #444;
+            color: white;
+        }
+        .workspace {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            overflow: auto;
+            .image-to-edit {
+                width: 100%;
+                position: relative;
+                height: fit-content;
+                img {
+                    width: 100%;
+                    height: auto;
+                }
+                
+            }
+        }
+    }
+}
+
+.react-resizable {
+    position: relative;
+    border: 1px solid #ccc;
+
+}
+  .react-resizable-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    bottom: 0;
+    right: 0;
+    background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pg08IS0tIEdlbmVyYXRvcjogQWRvYmUgRmlyZXdvcmtzIENTNiwgRXhwb3J0IFNWRyBFeHRlbnNpb24gYnkgQWFyb24gQmVhbGwgKGh0dHA6Ly9maXJld29ya3MuYWJlYWxsLmNvbSkgLiBWZXJzaW9uOiAwLjYuMSAgLS0+DTwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DTxzdmcgaWQ9IlVudGl0bGVkLVBhZ2UlMjAxIiB2aWV3Qm94PSIwIDAgNiA2IiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojZmZmZmZmMDAiIHZlcnNpb249IjEuMSINCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbDpzcGFjZT0icHJlc2VydmUiDQl4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjZweCIgaGVpZ2h0PSI2cHgiDT4NCTxnIG9wYWNpdHk9IjAuMzAyIj4NCQk8cGF0aCBkPSJNIDYgNiBMIDAgNiBMIDAgNC4yIEwgNCA0LjIgTCA0LjIgNC4yIEwgNC4yIDAgTCA2IDAgTCA2IDYgTCA2IDYgWiIgZmlsbD0iIzAwMDAwMCIvPg0JPC9nPg08L3N2Zz4=');
+    background-position: bottom right;
+    padding: 0 3px 3px 0;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    box-sizing: border-box;
+    cursor: se-resize;
+}
+.text-input {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fffa;
+    .text-editable {
+        width: 100%;
+        height: 100%;
+        padding: 15px;
+    }
+}

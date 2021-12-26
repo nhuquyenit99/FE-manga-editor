@@ -101,7 +101,6 @@ export const CropperImagePanel = () => {
                 </div>
             </div>
             <Cropper
-                style={{ flex: 1 }}
                 zoomTo={0.5}
                 initialAspectRatio={1}
                 // preview=".img-preview"
