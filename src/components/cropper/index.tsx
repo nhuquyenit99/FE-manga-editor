@@ -12,7 +12,7 @@ import 'cropperjs/dist/cropper.css';
 import './style.scss';
 
 const defaultSrc =
-  'https://raw.githubusercontent.com/roadmanfong/react-cropper/master/example/img/child.jpg';
+  '/home/nhim/Reposities/open-mantra-dataset/images/tencho_isoro/ja/011.jpg';
 
 export const CropperImagePanel = () => {
     const [image, setImage] = useState(defaultSrc);
