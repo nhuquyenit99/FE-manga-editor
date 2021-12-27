@@ -25,18 +25,12 @@
         flex: 1;
         display: flex;
         height: calc(100vh - 50px);
-        .tool-menu {
-            height: 100%;
-            width: 400px;
-            background-color: #444;
-            color: white;
-        }
         .workspace {
             padding: 30px;
             flex: 1;
             display: flex;
-            align-items: center;
             overflow: auto;
+            height: calc(100vh - 50px);
             .image-to-edit {
                 width: 100%;
                 position: relative;
@@ -49,16 +43,75 @@
             }
         }
     }
-}
-.text-input {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    .text-editable {
-        width: 100%;
+    .text-tool-menu {
         height: 100%;
+        width: 400px;
+        background-color: #444;
+        color: white;
         padding: 15px;
-        background-color: #fffa;
+        h3 {
+            color: white;
+            &:not(:first-child) {
+                margin-top: 20px;
+            }
+        }
+        .style-menu {
+            display: flex;
+            column-gap: 10px;
+            .ant-btn {
+                color: white;
+                border: none;
+                width: 50px;
+                height: 40px;
+                font-size: 16px;
+                &:not(.ant-btn-primary) {
+                    background-color: #666;
+                }
+            }
+        }
+        .sketch-picker {
+            color: rgba(0, 0, 0, 0.85);
+        }
+    }
+    .text-input {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        .text-editable {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            text-align: center;
+        }
+    }
+    .btn-save {
+        margin-top: 20px;
+    }
+
+    .select-font-size {
+        width: 120px;
+        background-color: #666;
+        color: white;
+        border: none;
+        height: 40px;
+        .ant-input-number-input-wrap input{
+            height: 40px;
+        }
+        .ant-input-number-handler-wrap {
+            opacity: 1;
+            background-color: #1890ff;
+            background-color: rgba(0, 0, 0, 0.45);
+            .anticon {
+                color: white;
+            }
+        }
     }
 }
+
+.pick-color-overlay {
+    .ant-popover-inner-content {
+        padding: 0;
+    }
+}
+
