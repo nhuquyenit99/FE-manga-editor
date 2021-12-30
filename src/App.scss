@@ -1,24 +1,35 @@
 @import '~antd/dist/antd.css';
 
 @font-face {
-  font-family: "Jolly Lodger";
-  src: url("./assets/fonts/JollyLodger-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-  font-display: block;
+	font-family: "Jolly Lodger";
+	src: url("./assets/fonts/JollyLodger-Regular.ttf") format("truetype");
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
 }
 
 /* width */
 ::-webkit-scrollbar {
-  width: 10px;
+ 	width: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #333; 
+  	background: #333; 
 }
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #111; 
+  	background: #111; 
+}
+
+.ant-btn-primary {
+    background: linear-gradient(180deg,#00a3da,#09c);
+	transition: none;
+	svg {
+		color: white;
+	}
+	&:hover {
+		box-shadow: 0 0 15px #0099cc99;
+	}
 }
