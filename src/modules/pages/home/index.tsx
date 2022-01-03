@@ -1,8 +1,6 @@
 import React from 'react';
-import { Button, Popover, Upload } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faPenNib, faHistory, faHome, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { Button, Upload } from 'antd';
+import { SideBar } from '../../../components';
 import backgroundImage from '../../../assets/bg-img.png';
 import './style.scss';
 
@@ -14,36 +12,7 @@ export function HomePage () {
             </div>
             <div className='content-body'>
                 <img src={backgroundImage} alt='girl-background' className='bg-img'/>
-                <div className='side-bar'>
-                    <div className='head-banner'>
-                        <span>MangaEd</span>
-                    </div>
-                    <div className='menu'>
-                        <div className='menu-button active'>
-                            <FontAwesomeIcon icon={faHome}/>
-                            <b>HOME</b>
-                        </div>
-                        <div className='menu-button'>
-                            <FontAwesomeIcon icon={faHistory}/>
-                            <b>HISTORY</b>
-                        </div>
-                        <div className='menu-button'>
-                            <FontAwesomeIcon icon={faGlobe}/>
-                            <b>TRANS</b>
-                        </div>
-                        <div className='menu-button'>
-                            <FontAwesomeIcon icon={faPenNib}/>
-                            <b>EDIT</b>
-                        </div>
-                        
-                    </div>
-                    <div className='splitter'/>
-                    <Popover content='Open Image' overlayClassName='custom-tooltip' placement='right'>
-                        <Button type='primary' shape='circle' className='home-open-image'>
-                            <FontAwesomeIcon icon={faPlus}/>
-                        </Button>
-                    </Popover>
-                </div>
+                <SideBar />
                 <div className='main-content'>
                     <div className='content-box'>
                         <Upload.Dragger>

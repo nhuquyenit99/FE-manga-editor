@@ -34,84 +34,9 @@
             bottom: -60px;
         }
     }
-    .side-bar {
-        display: flex;
-        flex-direction: column;
-        width: 100px;
-        height: max-content;
-        border-radius: 10px;
-        background: #23262a9c;
-        padding-bottom: 10px;
-        .head-banner {
-            height: 65px;
-            width: 100px;
-            background: #0099CC;
-            background-image: url('../../../assets/top.svg');
-            background-repeat: no-repeat;
-            background-size: 100px 65px;
-            margin-right: 6px;
-            position: relative;
-            text-align: center;
-            border-radius: 10px 10px 0 0;
-            span {
-                background-color: #fff;
-                box-shadow: 3px 3px 6px rgba(0, 0, 0, 20%);
-                color: #222;
-                display: block;
-                font-size: 14px;
-                font-weight: 700;
-                left: -5px;
-                letter-spacing: 1px;
-                line-height: 22px;
-                padding: 0 6px 0 7px;
-                position: absolute;
-                text-decoration: none;
-                top: 24px;
-                transform: rotate(-4deg);
-                white-space: nowrap;
-            }
-        }
-        .menu {
-            padding: 15px 10px;
-            .menu-button {
-                cursor: pointer;
-                display: flex;
-                flex-direction: column;
-                color: hsla(0,0%,100%,0.6);
-                align-items: center;
-                width: 100%;
-                border-radius: 5px;
-                padding: 15px 10px;
-                row-gap: 2px;
-                svg {
-                    font-size: 20px;
-                }
-                &.active {
-                    background: #343434;
-                    color: white;
-                }
-                &:hover {
-                    color: white;
-                }
-                &:not(:last-child) {
-                    margin-bottom: 10px;
-                }
-            }
-        }
-        .home-open-image {
-            display: block;
-            height: 50px;
-            width: 50px;
-            margin: 14px auto 10px;
-        }
-        .splitter {
-            background: url('../../../assets/bg-hash.svg');
-            height: 8px;
-            min-height: 8px;
-        }
-    }
+
     .main-content {
-        padding: 0 25px;
+        margin-left: 25px;
         flex: 1;
         .content-box {
             background: #23262a9c;
