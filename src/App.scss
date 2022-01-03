@@ -33,3 +33,22 @@
 		box-shadow: 0 0 15px #0099cc99;
 	}
 }
+.splitter {
+    background: url('./assets/bg-hash.svg');
+    height: 8px;
+    min-height: 8px;
+}
+
+.custom-tooltip {
+    .ant-popover-inner{
+        background: #eee;
+        border-radius: 4px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 30%);
+        color: #000;
+        overflow: hidden;
+        padding: 2px 10px;
+        .ant-popover-inner-content {
+            padding: 0;
+        }
+    }
+}

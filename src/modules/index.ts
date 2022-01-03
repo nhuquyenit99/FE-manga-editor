@@ -23,4 +23,14 @@ export function setup(module: Module) {
         exact: true,
         component: TranslatePage,
     });
+    module.route({
+        path: '/edit/:id',
+        exact: false,
+        component: EditPage,
+    });
+    module.route({
+        path: '/translate/:id',
+        exact: false,
+        component: TranslatePage,
+    });
 }
