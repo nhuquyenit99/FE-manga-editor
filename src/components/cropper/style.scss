@@ -7,10 +7,11 @@
     background-color: #333;
     overflow: hidden;
 
-    .cropper-wrap-box {
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
+    .cropper-wrapper {
+        width: 100%;
+        padding: 15px;
+        flex: 1;
+        height: 100%;
     }
     .crop-toolbox {
         position: absolute;
@@ -35,14 +36,13 @@
         }
     }
     .header {
-        height: 50px;
         background: #666;
         color: white;
         width: 100%;
         display: flex;
         justify-content: space-between;
-        padding: 10px 15px;
         align-items: center;
+        padding: 0 15px;
         .content-right {
             display: flex;
             column-gap: 10px;
@@ -50,8 +50,9 @@
         .title {
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 1.5rem;
+            font-size: 30px;
             font-family: 'Jolly Lodger';
+            line-height: 61px;
         }
     }
 }

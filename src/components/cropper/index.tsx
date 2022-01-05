@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button } from 'antd';
 import Cropper from 'react-cropper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,14 +10,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import 'cropperjs/dist/cropper.css';
 import './style.scss';
+import { ImageContext } from '../../context';
 
 const defaultSrc =
   'https://raw.githubusercontent.com/roadmanfong/react-cropper/master/example/img/child.jpg';
 
 export const CropperImagePanel = () => {
-    const [image, setImage] = useState(defaultSrc);
+    const {imageUrl} = useContext(ImageContext);
+    const [image, setImage] = useState(imageUrl);
     const [cropData, setCropData] = useState('');
     const [cropper, setCropper] = useState<any>();
+    const [mode, setMode] = useState<'move'| 'crop'>('move');
     const onChange = (e: any) => {
         e.preventDefault();
         let files;
@@ -42,12 +45,14 @@ export const CropperImagePanel = () => {
     const onCrop = () => {
         if (cropper) {
             cropper.setDragMode('crop');
+            setMode('crop');
         }
     };
 
     const onMove = () => {
         if (cropper) {
             cropper.setDragMode('move');
+            setMode('move');
         }
     };
 
@@ -95,30 +100,34 @@ export const CropperImagePanel = () => {
                 <br /> */}
             <div className='header'>
                 <div className='title'>CROPPER</div>  
-                <div className='content-right'>
+                {mode === 'crop' && <div className='content-right'>
                     <Button type='primary' shape='round'>Save</Button>
                     <Button shape='round'>Cancel</Button>
-                </div>
+                </div>}
             </div>
-            <Cropper
-                zoomTo={0.5}
-                initialAspectRatio={1}
-                // preview=".img-preview"
-                src={image}
-                viewMode={1}
-                minCropBoxHeight={10}
-                minCropBoxWidth={10}
-                background={false}
-                responsive={true}
-                autoCrop={false}
-                // autoCropArea={1}
-                checkOrientation={false}
-                onInitialized={(instance) => {
-                    setCropper(instance);
-                }}
-                dragMode='move'
-                guides={true}
-            />
+            <div className='cropper-wrapper'>
+                <Cropper
+                    zoomTo={0.5}
+                    initialAspectRatio={1}
+                    minCanvasHeight={800}
+                    // preview=".img-preview"
+                    src={image}
+                    viewMode={1}
+                    minCropBoxHeight={10}
+                    minCropBoxWidth={10}
+                    background={false}
+                    responsive={true}
+                    autoCrop={false}
+                    // autoCropArea={1}
+                    checkOrientation={false}
+                    onInitialized={(instance) => {
+                        setCropper(instance);
+                    }}
+                    dragMode='move'
+                    guides={true}
+                />
+            </div>
+
             <div className="crop-toolbox">
                 <button onClick={onMove}><FontAwesomeIcon icon={faMousePointer} /></button>
                 <button onClick={onCrop}><FontAwesomeIcon icon={faCropAlt} /></button>
