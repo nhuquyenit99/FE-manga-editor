@@ -168,13 +168,14 @@ export const InsertTextPanel = () => {
                         <h3>Font Family</h3>
                         <Select 
                             className='select-font-family'
-                            defaultValue='Comic-2'
+                            value={textBoxs[activeTextBox]?.style?.fontFamily}
                             options={Object.entries(ListFontFamily).map(([key, label]) => {
                                 return {
                                     label: <div style={{
                                         fontFamily: `${key}`, 
                                         fontSize: '18px',
-                                        lineHeight: '38px'
+                                        lineHeight: '40px',
+                                        paddingLeft: '2px'
                                     }}>{label}</div>,
                                     value: key
                                 };

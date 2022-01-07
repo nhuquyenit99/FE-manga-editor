@@ -3,7 +3,7 @@ export const defaultTextBoxStyle = {
     color: 'rgba(20,20,20,1)',
     fontSize: '18px',
     borderRadius: '0px',
-    fontFamily: 'Comic-2'
+    fontFamily: 'Comic-1'
 };
 
 export const defaultCordinate = {
