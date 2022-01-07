@@ -32,3 +32,8 @@ export function ImageContextProvider ({children}: {children: React.ReactNode}) {
         </ImageContext.Provider >
     );
 }
+
+export const TextBoxActiveContext = React.createContext({
+    activeId: '',
+    setActiveId: (id: string) => {}
+});

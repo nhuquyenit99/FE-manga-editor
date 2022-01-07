@@ -55,7 +55,7 @@ export const SideBar = () => {
                         if (res?.data?.url) {
                             setImageUrl(res?.data?.url ?? '');
                             // localStorage.setItem('imageUrl', res?.data?.url);
-                            history.push('/edit');
+                            history.push('/edit/text');
                         }
                     } catch (e) {
                         notification.error({

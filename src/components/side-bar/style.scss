@@ -6,6 +6,7 @@
     border-radius: 10px;
     background: #23262a9c;
     padding-bottom: 10px;
+
     .head-banner {
         height: 65px;
         width: 100px;
@@ -17,6 +18,7 @@
         position: relative;
         text-align: center;
         border-radius: 10px 10px 0 0;
+
         span {
             background-color: #fff;
             box-shadow: 3px 3px 6px rgba(0, 0, 0, 20%);
@@ -35,45 +37,48 @@
             white-space: nowrap;
         }
     }
+
     .menu {
         padding: 15px 10px;
+
         .menu-button {
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            color: hsla(0,0%,100%,0.6);
+            color: hsla(0, 0%, 100%, 0.6);
             align-items: center;
             width: 100%;
             border-radius: 5px;
             padding: 15px 10px;
             row-gap: 2px;
+
             svg {
                 font-size: 20px;
             }
+
             &.active {
                 background: #343434;
                 color: white;
             }
+
             &:hover {
                 color: white;
             }
+
             &:not(:last-child) {
                 margin-bottom: 10px;
             }
         }
     }
+
     .home-open-image {
         display: block;
         height: 50px;
         width: 50px;
         margin: 14px auto 10px;
     }
-    .splitter {
-        background: url('../../assets/bg-hash.svg');
-        height: 8px;
-        min-height: 8px;
-    }
-    .side-bar-upload .ant-upload{
+
+    .side-bar-upload .ant-upload {
         display: block;
     }
 }

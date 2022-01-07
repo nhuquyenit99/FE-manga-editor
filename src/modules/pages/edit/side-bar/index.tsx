@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Popover } from 'antd';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEraser, faPencilAlt, faHome, faCrop, faFont } from '@fortawesome/free-solid-svg-icons';
 import './style.scss';
@@ -11,10 +11,9 @@ type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
 type EditSidebarProps = {
     action: EditAction;
-    setAction: (action: EditAction) => void
 }
 
-export const EditSideBar = ({action, setAction}: EditSidebarProps) => {
+export const EditSideBar = ({action}: EditSidebarProps) => {
     const history = useHistory();
     const { setImageUrl } = useContext(ImageContext);
     return (
@@ -27,27 +26,27 @@ export const EditSideBar = ({action, setAction}: EditSidebarProps) => {
             </div>
             <div className='splitter'/>
             <div className='menu'>
-                <Popover content='Crop image' key='crop' overlayClassName='custom-tooltip' placement='right'>
-                    <div className={mergeClass('menu-button', action ==='crop' ? 'active' : '')} 
-                        onClick={() => setAction('crop')}>
-                        <FontAwesomeIcon icon={faCrop}/>
-                    </div>
-                </Popover>
                 <Popover content='Add text' key='text' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='text' ? 'active' : '')} 
-                        onClick={() => setAction('text')}>
+                        onClick={() => history.push('/edit/text')}>
                         <FontAwesomeIcon icon={faFont}/>
+                    </div>
+                </Popover>
+                <Popover content='Crop image' key='crop' overlayClassName='custom-tooltip' placement='right'>
+                    <div className={mergeClass('menu-button', action ==='crop' ? 'active' : '')} 
+                        onClick={() => history.push('/edit/crop')}>
+                        <FontAwesomeIcon icon={faCrop}/>
                     </div>
                 </Popover>
                 <Popover content='Draw' key='draw' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='draw' ? 'active' : '')} 
-                        onClick={() => setAction('draw')}> 
+                        onClick={() => history.push('/edit/draw')}> 
                         <FontAwesomeIcon icon={faPencilAlt}/>
                     </div>
                 </Popover>
                 <Popover content='Eraser' key='eraser' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='erase' ? 'active' : '')} 
-                        onClick={() => setAction('erase')}> 
+                        onClick={() => history.push('/edit/erase')}> 
                         <FontAwesomeIcon icon={faEraser}/>
                     </div>
                 </Popover>
