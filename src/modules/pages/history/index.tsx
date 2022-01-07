@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { SideBar } from '../../../components';
 import backgroundImage from '../../../assets/bg-img.png';
-import './style.scss';
-import { useContext } from 'react';
 import { ImageContext } from '../../../context';
 import { useHistory } from 'react-router-dom';
+import NoDataFoundPng from '../../../assets/nodata-found.png';
+import './style.scss';
+import moment from 'moment';
+
+type FileData = {
+    url: string
+    original_filename: string
+    created_at: string
+}
 
 export function HistoryPage () {
     const { setImageUrl } = useContext(ImageContext);
     const history = useHistory();
 
-    const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '[]') as string[];
+    const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '[]') as FileData[];
 
     return (
         <div className='home-page-layout history-page-layout'>
@@ -18,20 +25,26 @@ export function HistoryPage () {
                 <div className='title'>MANGA EDITOR</div>
             </div>
             <div className='content-body'>
-                <img src={backgroundImage} alt='girl-background' className='bg-img'/>
                 <SideBar />
                 <div className='main-content'>
+                    <h3 className='title'>All projects</h3>
                     <div className='list-uploaded'>
-                        {listUploaded.map((item, idx) => (
-                            <div className='image-wrapper' key={`${item}-${idx}`} onClick={() => {
-                                setImageUrl(item);
+                        {listUploaded.length > 0 ? listUploaded.map((item, idx) => (
+                            <div className='image-item' key={item.created_at} onClick={() => {
+                                setImageUrl(item.url);
                                 history.push('/edit/text');
                             }}>
-                                {/* eslint-disable-next-line jsx-a11y/img-redundant-alt*/}
-                                <img src={item} alt='Image'/>
-                                <div className='hover-text'>Continue editting image</div>
+                                <div className='image-wrapper'>
+                                    {/* eslint-disable-next-line jsx-a11y/img-redundant-alt*/}
+                                    <img src={item.url} alt='Image'/>
+                                    <div className='hover-text'>Continue editting image</div>
+                                </div>
+                                <div className='name'>{item.original_filename ?? 'Image File'}</div>
+                                <div className='time'>{moment(item.created_at).fromNow()}</div>
                             </div>
-                        ))}
+                        )): <div className='no-data-panel'>
+                            <img src={NoDataFoundPng} alt='No data found'/>
+                        </div>}
                     </div>
                 </div>
             </div>

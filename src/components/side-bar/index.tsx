@@ -5,8 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, notification, Popover, Upload } from 'antd';
 import { mergeClass } from '../../utils';
 import { ImageContext } from '../../context';
-import './style.scss';
 import { DataAccess } from '../../access';
+import './style.scss';
 
 export const SideBar = () => {
     const history = useHistory();
@@ -52,11 +52,14 @@ export const SideBar = () => {
                         formData.append('file', file);
                         formData.append('upload_preset', 'yj7nifwi');
                         const res = await DataAccess.uploadImage(formData);
-                        if (res?.data?.url) {
-                            setImageUrl(res?.data?.url);
+                        if (res?.data) {
+                            setImageUrl(res?.data?.secure_url);
                             const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
-                            localStorage.setItem('uploadedList', JSON.stringify([...uploadedList, res?.data?.url]));
-                            // localStorage.setItem('imageUrl', res?.data?.url);
+                            localStorage.setItem('uploadedList', JSON.stringify([{
+                                url: res?.data?.secure_url,
+                                original_filename: res?.data?.original_filename,
+                                created_at: res?.data?.created_at
+                            }, ...uploadedList]));
                             history.push('/edit/text');
                         }
 
