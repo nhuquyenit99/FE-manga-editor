@@ -27,11 +27,6 @@ export const SideBar = () => {
                     <FontAwesomeIcon icon={faHome}/>
                     <b>HOME</b>
                 </Link>
-                <Link className={mergeClass('menu-button', pathName === '/history' ? 'active' : '')} 
-                    to='/history' key='/history'>
-                    <FontAwesomeIcon icon={faHistory}/>
-                    <b>HISTORY</b>
-                </Link>
                 <Link className={mergeClass('menu-button', pathName === '/translate' ? 'active' : '')}  
                     to='/translate' key='/translate'>
                     <FontAwesomeIcon icon={faGlobe}/>
@@ -41,6 +36,11 @@ export const SideBar = () => {
                     to='/edit' key='/edit'>
                     <FontAwesomeIcon icon={faPenNib}/>
                     <b>EDIT</b>
+                </Link>
+                <Link className={mergeClass('menu-button', pathName === '/history' ? 'active' : '')} 
+                    to='/history' key='/history'>
+                    <FontAwesomeIcon icon={faHistory}/>
+                    <b>HISTORY</b>
                 </Link>
             </div>
             <div className='splitter'/>
@@ -53,10 +53,13 @@ export const SideBar = () => {
                         formData.append('upload_preset', 'yj7nifwi');
                         const res = await DataAccess.uploadImage(formData);
                         if (res?.data?.url) {
-                            setImageUrl(res?.data?.url ?? '');
+                            setImageUrl(res?.data?.url);
+                            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
+                            localStorage.setItem('uploadedList', JSON.stringify([...uploadedList, res?.data?.url]));
                             // localStorage.setItem('imageUrl', res?.data?.url);
                             history.push('/edit/text');
                         }
+
                     } catch (e) {
                         notification.error({
                             message: 'Upload Image Failed'

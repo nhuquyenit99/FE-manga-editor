@@ -32,7 +32,8 @@ export function HomePage () {
                                     const res = await DataAccess.uploadImage(formData);
                                     if (res?.data?.url) {
                                         setImageUrl(res?.data?.url ?? '');
-                                        // localStorage.setItem('imageUrl', res?.data?.url);
+                                        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
+                                        localStorage.setItem('uploadedList', JSON.stringify([...uploadedList, res?.data?.url]));
                                         history.push('/edit/text');
                                     }
                                 } catch (e) {

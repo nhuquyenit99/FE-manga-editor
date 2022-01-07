@@ -1,6 +1,8 @@
 .edit-side-bar {
     background: hsl(218, 9%, 18%);
     border-right: 2px solid #171719;
+    display: flex;
+    flex-direction: column;
 
     .svg-inline--fa {
         font-size: 28px;
@@ -8,6 +10,7 @@
 
     .menu {
         margin-top: 25px;
+        flex: 1;
 
         .menu-button {
             padding: 15px;
@@ -39,6 +42,17 @@
 
         &:hover {
             color: white;
+        }
+    }
+
+    .side-bar-upload {
+        padding: 15px;
+        .svg-inline--fa {
+            color: hsla(0, 0%, 100%, 0.6);
+            cursor: pointer;
+            &:hover {
+                color: white;
+            }
         }
     }
 }

@@ -19,6 +19,9 @@ class RootApplication extends React.Component<{}, { loading: boolean }> {
     }
     componentDidMount() {
         this.init();
+        window.addEventListener('beforeunload', e => {
+            localStorage.removeItem('imageUrl');
+        });
     }
 
     setupModule() {

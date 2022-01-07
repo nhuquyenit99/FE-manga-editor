@@ -1,11 +1,13 @@
-import React, { useContext } from 'react';
-import { Popover } from 'antd';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { notification, Popover, Upload } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEraser, faPencilAlt, faHome, faCrop, faFont } from '@fortawesome/free-solid-svg-icons';
-import './style.scss';
+import { faEraser, faPencilAlt, faHome, faCrop, faFont, faImages } from '@fortawesome/free-solid-svg-icons';
 import { ImageContext } from '../../../../context';
 import { mergeClass } from '../../../../utils';
+import { DataAccess } from '../../../../access';
+import './style.scss';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -16,6 +18,7 @@ type EditSidebarProps = {
 export const EditSideBar = ({action}: EditSidebarProps) => {
     const history = useHistory();
     const { setImageUrl } = useContext(ImageContext);
+    const [loading, setLoading] = useState(false);
     return (
         <div className='edit-side-bar'>
             <div className='home-button' onClick={() => {
@@ -51,6 +54,33 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                     </div>
                 </Popover>
             </div>
+            <div className='splitter'/>
+            <Upload className='side-bar-upload' showUploadList={false} maxCount={1} accept='image/*'
+                customRequest={async ({file}) => {
+                    try {
+                        setLoading(true);
+                        let formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('upload_preset', 'yj7nifwi');
+                        const res = await DataAccess.uploadImage(formData);
+                        if (res?.data?.url) {
+                            setImageUrl(res?.data?.url ?? '');
+                            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
+                            localStorage.setItem('uploadedList', JSON.stringify([...uploadedList, res?.data?.url]));
+                        }
+                    } catch (e) {
+                        notification.error({
+                            message: 'Upload Image Failed'
+                        });
+                    } finally {
+                        setLoading(false);
+                    }
+                }}
+            >
+                <Popover content='Change Image' overlayClassName='custom-tooltip' placement='right'>
+                    {loading ? <LoadingOutlined /> : <FontAwesomeIcon icon={faImages}/>}
+                </Popover>
+            </Upload>
         </div>
     );
 };
