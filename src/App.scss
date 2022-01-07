@@ -1,38 +1,209 @@
 @import '~antd/dist/antd.css';
 
 @font-face {
-	font-family: "Jolly Lodger";
-	src: url("./assets/fonts/JollyLodger-Regular.ttf") format("truetype");
-	font-weight: normal;
-	font-style: normal;
-	font-display: block;
+    font-family: "Jolly-Lodger";
+    src: url("./assets/fonts/JollyLodger-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Astro-City";
+    src: url("./assets/fonts/MTO-Astro-City.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Augie";
+    src: url("./assets/fonts/MTO-augie.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Canun";
+    src: url("./assets/fonts/MTO-Canun.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Chancery";
+    src: url("./assets/fonts/MTO-Chancery.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Chiller";
+    src: url("./assets/fonts/MTO-Chiller.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Comic-1";
+    src: url("./assets/fonts/MTO-COMIC-1.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Comic-2";
+    src: url("./assets/fonts/MTO-COMIC-2.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Damn-Noisy-Kids";
+    src: url("./assets/fonts/MTO-Damn-Noisy-Kids.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Dom";
+    src: url("./assets/fonts/MTO-Dom.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Franko";
+    src: url("./assets/fonts/MTO-Franko.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Getting-Angry";
+    src: url("./assets/fonts/MTO-Getting-Angry.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Grunge-Sans";
+    src: url("./assets/fonts/MTO-Grunge-Sans.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Grunge-Sans-Shadow";
+    src: url("./assets/fonts/MTO-Grunge-Sans-Shadow.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Jamai";
+    src: url("./assets/fonts/MTO-Jamai.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Monster-Talking";
+    src: url("./assets/fonts/MTO-Monster-Talking.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Mysti";
+    src: url("./assets/fonts/MTO-Mysti.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Oliver";
+    src: url("./assets/fonts/MTO-Oliver.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Telephone";
+    src: url("./assets/fonts/MTO-Telephone.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Wahroonga";
+    src: url("./assets/fonts/MTO-Wahroonga.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Yikes";
+    src: url("./assets/fonts/MTO-Yikes.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "You-are-loved";
+    src: url("./assets/fonts/MTO-You-are-loved.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
 }
 
 /* width */
 ::-webkit-scrollbar {
- 	width: 10px;
+    width: 10px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  	background: #333; 
+    background: #333;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  	background: #111; 
+    background: #111;
 }
 
 .ant-btn-primary {
-    background: linear-gradient(180deg,#00a3da,#09c);
-	transition: none;
-	svg {
-		color: white;
-	}
-	&:hover {
-		box-shadow: 0 0 15px #0099cc99;
-	}
+    background: linear-gradient(180deg, #00a3da, #09c);
+    transition: none;
+
+    svg {
+        color: white;
+    }
+
+    &:hover {
+        box-shadow: 0 0 15px #0099cc99;
+    }
 }
+
 .splitter {
     background: url('./assets/bg-hash.svg');
     height: 8px;
@@ -40,13 +211,14 @@
 }
 
 .custom-tooltip {
-    .ant-popover-inner{
+    .ant-popover-inner {
         background: #eee;
         border-radius: 4px;
         box-shadow: 0 0 20px rgba(0, 0, 0, 30%);
         color: #000;
         overflow: hidden;
         padding: 2px 10px;
+
         .ant-popover-inner-content {
             padding: 0;
         }

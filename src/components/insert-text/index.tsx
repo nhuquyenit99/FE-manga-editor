@@ -1,40 +1,18 @@
 import React, { useContext, useState } from 'react';
 import _ from 'lodash';
-import { Button } from 'antd';
+import { Button, Select } from 'antd';
 import { Popover, InputNumber } from 'antd';
-import { RGBColor, SketchPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faBold, faItalic, faUnderline, faStrikethrough, faFont
 } from '@fortawesome/free-solid-svg-icons';
 
-import { defaultCordinate, defaultTextBoxStyle, TextBoxData } from '../../model';
+import { defaultCordinate, defaultTextBoxStyle, ListFontFamily, TextBoxData } from '../../model';
+import { getColorStrFromRgba, getRgbaFromString, getSizeFromPixel } from '../../utils';
 import { ImageContext, TextBoxActiveContext } from '../../context';
 import { TextBox } from '../text-box';
 import './style.scss';
-
-const getRgbaFromString = (colorStr?: string) => {
-    if (!colorStr) {
-        return undefined;
-    }
-    const splittedStr = colorStr.split(',');
-    return {
-        r: splittedStr[0]?.slice(5),
-        g: splittedStr[1],
-        b: splittedStr[2],
-        a: splittedStr[3]?.slice(0, splittedStr[3].length - 1)
-    };
-};
-
-const getColorStrFromRgba = (color: RGBColor) => {
-    return `rgba(${color.r},${color.g},${color.b},${color.a})`;
-};
-
-const getSizeFromPixel = (size: string) => {
-    return Number.parseInt((size as string)?.slice(0,(size as string).length - 2 ));
-};
-
-
 
 export const InsertTextPanel = () => {
     const { imageUrl } = useContext(ImageContext);
@@ -187,6 +165,22 @@ export const InsertTextPanel = () => {
                                 <FontAwesomeIcon icon={faStrikethrough}/>
                             </Button>
                         </div>
+                        <h3>Font Family</h3>
+                        <Select 
+                            className='select-font-family'
+                            defaultValue='Comic-2'
+                            options={Object.entries(ListFontFamily).map(([key, label]) => {
+                                return {
+                                    label: <div style={{
+                                        fontFamily: `${key}`, 
+                                        fontSize: '18px',
+                                        lineHeight: '38px'
+                                    }}>{label}</div>,
+                                    value: key
+                                };
+                            })}
+                            onChange={onSetFontFamily}
+                        />
                         <h3>Text Color</h3>
                         <Popover 
                             trigger='click'

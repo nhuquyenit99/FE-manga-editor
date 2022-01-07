@@ -144,6 +144,16 @@
             }
         }
     }
+
+    .select-font-family {
+        width: 230px;
+
+        .ant-select-selector {
+            height: 40px !important;
+
+            .ant-select-selection-item {}
+        }
+    }
 }
 
 .pick-color-overlay {

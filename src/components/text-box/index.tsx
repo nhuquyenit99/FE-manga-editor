@@ -10,6 +10,7 @@ type TextBoxProps = {
 
 
 export const TextBox = ({data}: TextBoxProps) => {
+    console.log('🚀 ~ file: index.tsx ~ line 13 ~ TextBox ~ data', data);
     const { setActiveId } = useContext(TextBoxActiveContext);
     return (
         <Rnd
@@ -23,7 +24,7 @@ export const TextBox = ({data}: TextBoxProps) => {
                 contentEditable
                 onClick={() => setActiveId(data.id)}
             >
-                New Text
+                Type something...
             </div>
         </Rnd>
     );
