@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { TextBoxData } from '../model';
 
 type ImageContextType = {
     imageUrl: string
@@ -35,5 +36,6 @@ export function ImageContextProvider ({children}: {children: React.ReactNode}) {
 
 export const TextBoxActiveContext = React.createContext({
     activeId: '',
-    setActiveId: (id: string) => {}
+    setActiveId: (id: string) => {},
+    removeTextBox: (id: string) => {}
 });

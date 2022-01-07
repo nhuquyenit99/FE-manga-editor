@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { CloseCircleOutlined } from '@ant-design/icons';
 import { Rnd } from 'react-rnd';
 import { TextBoxActiveContext } from '../../context';
 import { TextBoxData } from '../../model';
@@ -8,10 +9,8 @@ type TextBoxProps = {
     data: TextBoxData,
 }
 
-
 export const TextBox = ({data}: TextBoxProps) => {
-    console.log('🚀 ~ file: index.tsx ~ line 13 ~ TextBox ~ data', data);
-    const { setActiveId } = useContext(TextBoxActiveContext);
+    const { setActiveId, removeTextBox } = useContext(TextBoxActiveContext);
     return (
         <Rnd
             default={data.coordinates}
@@ -26,6 +25,7 @@ export const TextBox = ({data}: TextBoxProps) => {
             >
                 Type something...
             </div>
+            <CloseCircleOutlined className='btn-delete' onClick={() => removeTextBox(data.id)}/>
         </Rnd>
     );
 };

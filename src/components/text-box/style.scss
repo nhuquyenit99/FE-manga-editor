@@ -4,6 +4,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     border: 1px dashed transparent;
+    position: relative;
 
     .text-editable {
         width: 100%;
@@ -13,5 +14,17 @@
     }
     &:hover{
         border-color: black;
+        .btn-delete {
+            display: block;
+        }
+    }
+    .btn-delete {
+        position: absolute;
+        font-size: 20px;
+        right: 5px;
+        top: 5px;
+        cursor: pointer;
+        color: red;
+        display: none;
     }
 }

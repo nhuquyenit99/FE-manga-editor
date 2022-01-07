@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
-import { SideBar } from '../../../components';
-import backgroundImage from '../../../assets/bg-img.png';
-import { ImageContext } from '../../../context';
+import moment from 'moment';
 import { useHistory } from 'react-router-dom';
+import { SideBar } from '../../../components';
+import { ImageContext } from '../../../context';
 import NoDataFoundPng from '../../../assets/nodata-found.png';
 import './style.scss';
-import moment from 'moment';
 
 type FileData = {
     url: string

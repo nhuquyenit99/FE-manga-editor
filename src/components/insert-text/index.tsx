@@ -39,6 +39,15 @@ export const InsertTextPanel = () => {
         setActiveTextBox(id);
     };
 
+    const removeTextBox = (id: string) => {
+        let list = {...textBoxs};
+        delete list[id];
+        setTextBoxs(list);
+        if (activeTextBox === id) {
+            setActiveTextBox('');
+        }
+    };
+
     const updateActiveTextBoxStyle = (style: React.CSSProperties) => {
         setTextBoxs(prev => {
             return {
@@ -241,7 +250,8 @@ export const InsertTextPanel = () => {
                         <TextBoxActiveContext.Provider
                             value={{
                                 activeId: activeTextBox,
-                                setActiveId: setActiveTextBox
+                                setActiveId: setActiveTextBox,
+                                removeTextBox: removeTextBox
                             }}
                         >
                             {Object.values(textBoxs).map(textBox => (
