@@ -36,8 +36,10 @@
         margin-top: 50px;
     }
 }
-.loading-fullview {
+.ant-spin-spinning.loading-fullview {
     position: absolute;
+    top: 0;
+    left: 0;
     display: flex;
     justify-content: center;
     height: 100%;
@@ -45,7 +47,5 @@
     width: 100%;
     background: white;
     z-index: 499;
-}
-.loading-fullview.opacity {
     opacity: 50%;
 }

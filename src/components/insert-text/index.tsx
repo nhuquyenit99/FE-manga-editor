@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import _ from 'lodash';
 import { Button, Select } from 'antd';
 import { Popover, InputNumber } from 'antd';
@@ -7,15 +7,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faBold, faItalic, faUnderline, faStrikethrough, faFont
 } from '@fortawesome/free-solid-svg-icons';
+import { toPng, toJpeg, toSvg } from 'html-to-image';
 
 import { defaultCordinate, defaultTextBoxStyle, ListFontFamily, TextBoxData } from '../../model';
 import { getColorStrFromRgba, getRgbaFromString, getSizeFromPixel } from '../../utils';
 import { ImageContext, TextBoxActiveContext } from '../../context';
 import { TextBox } from '../text-box';
 import './style.scss';
+import { useCallback } from 'react';
+import moment from 'moment';
+import { ExportImageModal } from '../export-image';
 
 export const InsertTextPanel = () => {
     const { imageUrl } = useContext(ImageContext);
+    const imageRef = useRef<any>();
+    const saveModelRef = useRef<any>();
 
     const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
     const [activeTextBox, setActiveTextBox] = useState<string>('');
@@ -47,6 +53,32 @@ export const InsertTextPanel = () => {
             setActiveTextBox('');
         }
     };
+
+    const onSave = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.svg') => {
+        let dataUrl;
+        switch(extension) {
+        case '.jpg': 
+            dataUrl = await toJpeg(imageRef.current, { cacheBust: true, });
+            break;
+        case '.png': 
+            dataUrl = await toPng(imageRef.current, { cacheBust: true, });
+            break;
+        case '.svg': 
+            dataUrl = await toSvg(imageRef.current, { cacheBust: true, });
+            break;
+        }
+        dataUrl = await toPng(imageRef.current, { cacheBust: true, });
+        const link = document.createElement('a');
+        link.download = `${fileName}${extension}`;
+        link.href = dataUrl;
+        link.click();
+        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
+        localStorage.setItem('uploadedList', JSON.stringify([{
+            url: dataUrl,
+            original_filename: fileName,
+            created_at: moment().toISOString()
+        }, ...uploadedList]));
+    },[imageRef]);
 
     const updateActiveTextBoxStyle = (style: React.CSSProperties) => {
         setTextBoxs(prev => {
@@ -136,9 +168,12 @@ export const InsertTextPanel = () => {
         <div className='insert-text-panel-wrapper'>
             <div className='header'>
                 <div className='title'>Insert Text</div>  
+                <Button type='primary' onClick={() => saveModelRef.current?.open()} shape='round'>
+                    Save
+                </Button>
             </div>
             <div className='insert-text-panel'>
-                <div className='side-bar'>
+                <div className='insert-text-side-bar'>
                     <div className='splitter' />
                     <div className='text-tool-menu'>
                         <div className='btn-add-text' onClick={onAddText}>
@@ -245,7 +280,7 @@ export const InsertTextPanel = () => {
                     
                 </div>
                 <div className='workspace'>
-                    <div className='image-to-edit'>
+                    <div className='image-to-edit' ref={imageRef}>
                         <img src={imageUrl} alt='img-to-edit' draggable={false}/>
                         <TextBoxActiveContext.Provider
                             value={{
@@ -262,6 +297,10 @@ export const InsertTextPanel = () => {
                             ))}
                         </TextBoxActiveContext.Provider>
                     </div>
+                    <ExportImageModal 
+                        onSave={onSave}
+                        ref={saveModelRef}
+                    />
                 </div>
             </div>
         </div>

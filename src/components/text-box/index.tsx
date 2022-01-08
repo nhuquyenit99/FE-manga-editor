@@ -21,7 +21,14 @@ export const TextBox = ({data}: TextBoxProps) => {
                 style={data.style}
                 className='text-editable' 
                 contentEditable
-                onClick={() => setActiveId(data.id)}
+                onClick={(e) => {
+                    setActiveId(data.id);
+                    let range = document.createRange();
+                    range.selectNodeContents(e.target as any);
+                    let sel = window.getSelection()!;
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }}
             >
                 Type something...
             </div>

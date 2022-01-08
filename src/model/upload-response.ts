@@ -21,3 +21,9 @@ export const defaultUploadResponse = {
 };
 
 export type UploadResponse = typeof defaultUploadResponse;
+
+export type FileData = {
+    url: string
+    original_filename: string
+    created_at: string
+}

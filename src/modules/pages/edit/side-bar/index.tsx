@@ -35,12 +35,12 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                         <FontAwesomeIcon icon={faFont}/>
                     </div>
                 </Popover>
-                <Popover content='Crop image' key='crop' overlayClassName='custom-tooltip' placement='right'>
+                {/* <Popover content='Crop image' key='crop' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='crop' ? 'active' : '')} 
                         onClick={() => history.push('/edit/crop')}>
                         <FontAwesomeIcon icon={faCrop}/>
                     </div>
-                </Popover>
+                </Popover> */}
                 <Popover content='Draw' key='draw' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='draw' ? 'active' : '')} 
                         onClick={() => history.push('/edit/draw')}> 

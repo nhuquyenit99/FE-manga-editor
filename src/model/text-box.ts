@@ -9,8 +9,8 @@ export const defaultTextBoxStyle = {
 export const defaultCordinate = {
     x: 100,
     y: 100,
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
 };
 
 export type Cordinate = typeof defaultCordinate;
