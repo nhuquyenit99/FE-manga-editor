@@ -118,11 +118,12 @@ export const EditPage = () => {
                         <Panel />
                         <div className='workspace'>
                             <div className='image-to-edit' ref={imageRef}>
-                                {/* <img src={imageUrl} alt='img-to-edit' draggable={false}/> */}
-                                <CanvasDraw imgSrc={imageUrl}
+                                {panel === 'erase' ? <CanvasDraw imgSrc={imageUrl}
                                     {...getImageMeta(imageUrl)}
-                                    disabled
-                                />
+                                    brushColor="white"
+                                /> 
+                                    : <img src={imageUrl} alt='img-to-edit' draggable={false}/>
+                                }
                                 {Object.values(textBoxs).map(textBox => (
                                     <TextBox 
                                         key={textBox.id}

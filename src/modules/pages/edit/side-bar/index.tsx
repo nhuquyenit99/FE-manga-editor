@@ -41,16 +41,16 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                         <FontAwesomeIcon icon={faCrop}/>
                     </div>
                 </Popover> */}
-                <Popover content='Draw' key='draw' overlayClassName='custom-tooltip' placement='right'>
-                    <div className={mergeClass('menu-button', action ==='draw' ? 'active' : '')} 
-                        onClick={() => history.push('/edit/draw')}> 
-                        <FontAwesomeIcon icon={faPencilAlt}/>
-                    </div>
-                </Popover>
                 <Popover content='Eraser' key='eraser' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='erase' ? 'active' : '')} 
                         onClick={() => history.push('/edit/erase')}> 
                         <FontAwesomeIcon icon={faEraser}/>
+                    </div>
+                </Popover>
+                <Popover content='Draw' key='draw' overlayClassName='custom-tooltip' placement='right'>
+                    <div className={mergeClass('menu-button', action ==='draw' ? 'active' : '')} 
+                        onClick={() => history.push('/edit/draw')}> 
+                        <FontAwesomeIcon icon={faPencilAlt}/>
                     </div>
                 </Popover>
             </div>
