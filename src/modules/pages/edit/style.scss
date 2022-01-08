@@ -64,5 +64,63 @@
 
     .main-content {
         flex: 1;
+        height: 100vh;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background-color: #333;
+        overflow: hidden;  
+        .header {
+            height: 61px;
+            background: #23262A;
+            color: white;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px;
+            align-items: center;
+    
+            .title {
+                font-weight: bold;
+                text-transform: uppercase;
+                font-size: 30px;
+                font-family: 'Jolly Lodger';
+                line-height: 61px;
+            }
+            .ant-btn {
+                min-width: 100px;
+            }
+    
+            .suffix {
+                .ant-btn:last-child {
+                    margin-left: 15px;
+                }
+            }
+        }
+        .edit-panel-content {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 50px);
+    
+            .workspace {
+                padding: 20px;
+                flex: 1;
+                overflow: auto;
+                height: calc(100vh - 50px);
+    
+                .image-to-edit {
+                    width: fit-content;
+                    position: relative;
+                    height: fit-content;
+                    margin: auto;
+    
+                    img {
+                        width: 100%;
+                        height: auto;
+                    }
+    
+                }
+            }
+        }
     }
 }

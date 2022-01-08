@@ -34,8 +34,10 @@ export function ImageContextProvider ({children}: {children: React.ReactNode}) {
     );
 }
 
-export const TextBoxActiveContext = React.createContext({
+export const TextBoxContext = React.createContext({
     activeId: '',
     setActiveId: (id: string) => {},
-    removeTextBox: (id: string) => {}
+    removeTextBox: (id: string) => {},
+    textBoxs: {} as Record<string, TextBoxData>,
+    setTextBoxs: (() => {}) as React.Dispatch<React.SetStateAction<Record<string, TextBoxData>>>
 });

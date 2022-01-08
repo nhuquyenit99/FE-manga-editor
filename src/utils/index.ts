@@ -24,3 +24,13 @@ export const getColorStrFromRgba = (color: RGBColor) => {
 export const getSizeFromPixel = (size: string) => {
     return Number.parseInt((size as string)?.slice(0,(size as string).length - 2 ));
 };
+
+
+export function getImageMeta(url: any) {
+    let img = document.createElement('img');
+    img.src = url;
+    return {
+        canvasWidth: img.naturalWidth,
+        canvasHeight: img.naturalHeight
+    };
+}

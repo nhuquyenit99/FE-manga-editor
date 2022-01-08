@@ -1,16 +1,16 @@
 import React, { useContext } from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Rnd } from 'react-rnd';
-import { TextBoxActiveContext } from '../../context';
+import { TextBoxContext } from '../../context';
 import { TextBoxData } from '../../model';
 import './style.scss';
 
 type TextBoxProps = {
-    data: TextBoxData,
+    data: TextBoxData
 }
 
 export const TextBox = ({data}: TextBoxProps) => {
-    const { setActiveId, removeTextBox } = useContext(TextBoxActiveContext);
+    const { setActiveId, removeTextBox } = useContext(TextBoxContext);
     return (
         <Rnd
             default={data.coordinates}

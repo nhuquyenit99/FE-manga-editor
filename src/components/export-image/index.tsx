@@ -46,7 +46,7 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
     };
 
     return (
-        <Modal title='Save Image' visible={visible}
+        <Modal title='Export Image' visible={visible}
             onCancel={onCloseModal}
             className='export-image-modal'
             footer={<div className='footer'>

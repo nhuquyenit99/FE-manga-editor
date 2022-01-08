@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { notification, Popover, Upload } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEraser, faPencilAlt, faHome, faCrop, faFont, faImages } from '@fortawesome/free-solid-svg-icons';
+import { faEraser, faPencilAlt, faHome, faFont, faImages } from '@fortawesome/free-solid-svg-icons';
 import { ImageContext } from '../../../../context';
 import { mergeClass } from '../../../../utils';
 import { DataAccess } from '../../../../access';
