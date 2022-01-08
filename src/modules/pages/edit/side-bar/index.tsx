@@ -17,7 +17,7 @@ type EditSidebarProps = {
 
 export const EditSideBar = ({action}: EditSidebarProps) => {
     const history = useHistory();
-    const { setImageUrl } = useContext(ImageContext);
+    const { setImageUrl, imageUrl } = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
     return (
         <div className='edit-side-bar'>
@@ -29,7 +29,7 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
             </div>
             <div className='splitter'/>
             <div className='menu'>
-                <Popover content='Add text' key='text' overlayClassName='custom-tooltip' placement='right'>
+                {imageUrl && <><Popover content='Add text' key='text' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='text' ? 'active' : '')} 
                         onClick={() => history.push('/edit/text')}>
                         <FontAwesomeIcon icon={faFont}/>
@@ -53,6 +53,7 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                         <FontAwesomeIcon icon={faPencilAlt}/>
                     </div>
                 </Popover>
+                </>}
             </div>
             <div className='splitter'/>
             <Upload className='side-bar-upload' showUploadList={false} maxCount={1} accept='image/*'

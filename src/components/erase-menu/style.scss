@@ -1,0 +1,15 @@
+.erase-menu-sidebar {
+    width: 400px;
+    height: 100%;
+    background-color: #292c31eb;
+    h3 {
+        color: white;
+    
+        &:not(:first-child) {
+            margin-top: 20px;
+        }
+    }
+    .menu {
+        padding: 15px;
+    }
+}

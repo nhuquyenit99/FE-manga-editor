@@ -4,7 +4,11 @@ import CanvasDraw from 'react-canvas-draw';
 import { Button } from 'antd';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
-import { CropperImagePanel, InsertTextPanel, UploadImageDragger, TextBox, ExportImageModal } from '../../../components';
+import { 
+    CropperImagePanel, InsertTextPanel, 
+    UploadImageDragger, TextBox, 
+    ExportImageModal, EraseMenu 
+} from '../../../components';
 import { ImageContext, TextBoxContext } from '../../../context';
 import { getImageMeta } from '../../../utils';
 import { TextBoxData } from '../../../model';
@@ -147,5 +151,5 @@ const EditPanel: Record<EditAction, React.ComponentType> = {
     crop: CropperImagePanel,
     text: InsertTextPanel,
     draw: () => <div style={{color: 'white'}}>Draw Panel</div>,
-    erase: () => <div style={{color: 'white'}}>Erase Panel</div>
+    erase: EraseMenu
 };
