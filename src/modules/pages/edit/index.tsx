@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import moment from 'moment';
 import CanvasDraw from 'react-canvas-draw';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
@@ -140,23 +140,31 @@ export const EditPage = () => {
                             brushWidth: brushWidth,
                             setBrushWidth: setBrushWidth,
                             onUndo: () => canvasDrawRef?.undo?.(),
-                            onClearAll: () => canvasDrawRef?.eraseAll?.()
+                            onClearAll: () => canvasDrawRef?.clear?.()
                         }}
                         >
                             <Panel />
                             <div className='workspace'>
                                 <div className='change-mode-tool'>
-                                    <button onClick={() => {
-                                        setDisableZoom(true);
-                                        zoomRef.current?.resetTransform();
-                                    }}
-                                    className={disableZoom ? 'active' : ''}
-                                    ><FontAwesomeIcon icon={faMousePointer}/></button>
-                                    <button onClick={() => setDisableZoom(false)}
-                                        className={disableZoom ? '' : 'active'}
-                                    ><FontAwesomeIcon icon={faSearch}/></button>
+                                    {panel === 'erase' && <>
+                                        <Tooltip title='Disable Zoom' placement='right'>
+                                            <button onClick={() => {
+                                                setDisableZoom(true);
+                                                zoomRef.current?.resetTransform();
+                                            }}
+                                            className={disableZoom ? 'active' : ''}
+                                            ><FontAwesomeIcon icon={faMousePointer}/></button>
+                                        </Tooltip>
+                                        <Tooltip title='Zoom' placement='right'>
+                                            <button onClick={() => setDisableZoom(false)}
+                                                className={disableZoom ? '' : 'active'}
+                                            ><FontAwesomeIcon icon={faSearch}/></button>
+                                        </Tooltip>
+                            
+                                        
+                                    </>}
                                 </div>
-                                <TransformWrapper
+                                {/*<TransformWrapper
                                     minScale={0.2}
                                     maxScale={3}
                                     disabled={disableZoom}
@@ -166,24 +174,7 @@ export const EditPage = () => {
                                         <div className='image-panel-wrapper'>
                                             <div className='image-wrapper'>
                                                 <TransformComponent wrapperClass={disableZoom ? 'disabled-transform' : undefined}>
-                                                    <div className='image-to-edit' ref={imageRef}>
-                                                        <CanvasDraw imgSrc={imageUrl ?? ''}
-                                                            canvasHeight={canvasHeight}
-                                                            canvasWidth={canvasWidth}
-                                                            hideGrid
-                                                            ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                                                            onChange={() => {}}
-                                                            disabled={panel !== 'erase'}
-                                                            brushColor={brushColor}
-                                                            brushRadius={brushWidth}
-                                                        />
-                                                        {Object.values(textBoxs).map(textBox => (
-                                                            <TextBox 
-                                                                key={textBox.id}
-                                                                data={textBox}
-                                                            />
-                                                        ))}
-                                                    </div>
+                                                    
                                                 </TransformComponent>
                                             </div>
                                             {!disableZoom && <div className="tools">
@@ -193,7 +184,34 @@ export const EditPage = () => {
                                             </div>}
                                         </div>
                                     )}
-                                </TransformWrapper>
+                                </TransformWrapper> */}
+                                <div className='image-to-edit' ref={imageRef}>
+                                    <CanvasDraw imgSrc={imageUrl ?? ''}
+                                        canvasHeight={canvasHeight}
+                                        canvasWidth={canvasWidth}
+                                        hideGrid
+                                        ref={canvasDraw => (canvasDrawRef = canvasDraw)}
+                                        onChange={() => {}}
+                                        disabled={panel !== 'erase'}
+                                        brushColor={brushColor}
+                                        lazyRadius={1}
+                                        brushRadius={brushWidth}
+                                        //@ts-ignore
+                                        enablePanAndZoom={!disableZoom}
+                                    />
+                                    {Object.values(textBoxs).map(textBox => (
+                                        <TextBox 
+                                            key={textBox.id}
+                                            data={textBox}
+                                        />
+                                    ))}
+                                </div>
+                                {panel === 'erase' && !disableZoom && <div className='tools'>
+                                    <button onClick={() => {
+                                        canvasDrawRef?.resetView?.();
+                                    }}>Reset View
+                                    </button>
+                                </div>}
                                 <ExportImageModal 
                                     onSave={onExport}
                                     ref={saveModelRef}

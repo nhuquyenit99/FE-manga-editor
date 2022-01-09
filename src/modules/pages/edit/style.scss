@@ -164,11 +164,13 @@
                 }
 
                 .tools {
-
                     right: 20px;
-                }
-                .change-mode-tool {
-                    
+                    top: 80px;
+                    button {
+                        width: 100px;
+                        font-size: 14px;
+                        height: 30px;
+                    }
                 }
             }
         }

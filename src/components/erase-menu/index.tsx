@@ -12,8 +12,18 @@ export const EraseMenu = () => {
         setBrushWidth, setColor 
     } = useContext(EraserContext);
 
-    useEffect(() => {
+    const onUndoViaKeyDown = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.key === 'z') {
+            onUndo();
+        }
+    };
 
+    useEffect(() => {
+        document.addEventListener('keydown', onUndoViaKeyDown);
+        return () => {
+            document.removeEventListener('keydown', onUndoViaKeyDown);
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 
     return (
