@@ -220,7 +220,6 @@ export const InsertTextPanel = () => {
                         className='select-font-size'
                     />
                 </div>
-                <Button type='primary' shape='round' className='btn-save'>Save</Button>
             </div>
         </div>
     );

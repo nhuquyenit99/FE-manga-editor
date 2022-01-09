@@ -15,6 +15,8 @@ import { useImageSize } from '../../../utils';
 import { TextBoxData } from '../../../model';
 import { EditSideBar } from './side-bar';
 import './style.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMousePointer, faSearch, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -32,6 +34,7 @@ export const EditPage = () => {
     const [activeTextBox, setActiveTextBox] = useState<string>('');
     const [brushWidth, setBrushWidth] = useState(10);
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
+    const [disableZoom, setDisableZoom] = useState(true);
 
     let canvasDrawRef = null as any;
 
@@ -45,7 +48,6 @@ export const EditPage = () => {
     };
 
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.svg') => {
-        zoomRef.current?.resetTransform();
         let dataUrl;
         switch(extension) {
         case '.jpg': 
@@ -68,7 +70,7 @@ export const EditPage = () => {
             original_filename: fileName,
             created_at: moment().toISOString()
         }, ...uploadedList]));
-    },[imageRef, zoomRef]);
+    },[imageRef]);
 
     const { canvasHeight, canvasWidth } = useImageSize(imageUrl);
 
@@ -114,7 +116,10 @@ export const EditPage = () => {
                             setImageUrl('');
                             history.push('/');
                         }} >Cancel</Button>
-                        {imageUrl && <Button type='primary' onClick={() => saveModelRef.current?.open()} shape='round'>
+                        {imageUrl && <Button type='primary' onClick={() => {
+                            zoomRef.current?.resetTransform();
+                            saveModelRef.current?.open();
+                        }} shape='round'>
                             Export
                         </Button>}
                     </div>
@@ -140,39 +145,52 @@ export const EditPage = () => {
                         >
                             <Panel />
                             <div className='workspace'>
+                                <div className='change-mode-tool'>
+                                    <button onClick={() => {
+                                        setDisableZoom(true);
+                                        zoomRef.current?.resetTransform();
+                                    }}
+                                    className={disableZoom ? 'active' : ''}
+                                    ><FontAwesomeIcon icon={faMousePointer}/></button>
+                                    <button onClick={() => setDisableZoom(false)}
+                                        className={disableZoom ? '' : 'active'}
+                                    ><FontAwesomeIcon icon={faSearch}/></button>
+                                </div>
                                 <TransformWrapper
                                     minScale={0.2}
                                     maxScale={3}
-                                    // disabled
+                                    disabled={disableZoom}
                                     ref={zoomRef}
                                 >
                                     {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-                                        <div className='image-wrapper'>
-                                            <TransformComponent>
-                                                <div className='image-to-edit' ref={imageRef}>
-                                                    <CanvasDraw imgSrc={imageUrl ?? ''}
-                                                        canvasHeight={canvasHeight}
-                                                        canvasWidth={canvasWidth}
-                                                        hideGrid
-                                                        ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                                                        onChange={() => {}}
-                                                        disabled={panel !== 'erase'}
-                                                        brushColor={brushColor}
-                                                        brushRadius={brushWidth}
-                                                    />
-                                                    {Object.values(textBoxs).map(textBox => (
-                                                        <TextBox 
-                                                            key={textBox.id}
-                                                            data={textBox}
+                                        <div className='image-panel-wrapper'>
+                                            <div className='image-wrapper'>
+                                                <TransformComponent wrapperClass={disableZoom ? 'disabled-transform' : undefined}>
+                                                    <div className='image-to-edit' ref={imageRef}>
+                                                        <CanvasDraw imgSrc={imageUrl ?? ''}
+                                                            canvasHeight={canvasHeight}
+                                                            canvasWidth={canvasWidth}
+                                                            hideGrid
+                                                            ref={canvasDraw => (canvasDrawRef = canvasDraw)}
+                                                            onChange={() => {}}
+                                                            disabled={panel !== 'erase'}
+                                                            brushColor={brushColor}
+                                                            brushRadius={brushWidth}
                                                         />
-                                                    ))}
-                                                </div>
-                                            </TransformComponent>
-                                            <div className="tools">
-                                                <button onClick={() => zoomIn()}>+</button>
-                                                <button onClick={() => zoomOut()}>-</button>
-                                                <button onClick={() => resetTransform()}>x</button>
+                                                        {Object.values(textBoxs).map(textBox => (
+                                                            <TextBox 
+                                                                key={textBox.id}
+                                                                data={textBox}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </TransformComponent>
                                             </div>
+                                            {!disableZoom && <div className="tools">
+                                                <button onClick={() => zoomIn()} title='Zoom In'><FontAwesomeIcon icon={faSearchPlus}/></button>
+                                                <button onClick={() => zoomOut()} title='Zoom Out'><FontAwesomeIcon icon={faSearchMinus}/></button>
+                                                <button onClick={() => resetTransform()} title='Reset'><FontAwesomeIcon icon={faTimes}/></button>
+                                            </div>}
                                         </div>
                                     )}
                                 </TransformWrapper>
