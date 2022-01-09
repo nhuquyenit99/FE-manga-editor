@@ -20,9 +20,6 @@ export const EraseMenu = () => {
 
     useEffect(() => {
         document.addEventListener('keydown', onUndoViaKeyDown);
-        return () => {
-            document.removeEventListener('keydown', onUndoViaKeyDown);
-        };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[]);
 

@@ -48,6 +48,7 @@ export const EditPage = () => {
     };
 
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.svg') => {
+        canvasDrawRef?.resetView?.();
         let dataUrl;
         switch(extension) {
         case '.jpg': 
