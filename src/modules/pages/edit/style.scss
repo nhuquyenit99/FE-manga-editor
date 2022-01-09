@@ -107,6 +107,7 @@
                 flex: 1;
                 overflow: auto;
                 height: calc(100vh - 50px);
+
     
                 .image-to-edit {
                     width: fit-content;
@@ -119,6 +120,18 @@
                         height: auto;
                     }
     
+                }
+                .react-transform-wrapper {
+                    flex: 1;
+                    .react-transform-component {
+                        background-color: #e6f7ff26;
+                    }
+                }
+                .image-wrapper {
+                    display: flex;
+                    // height: max-content;
+                    // align-items: center;
+                    row-gap: 5px;
                 }
             }
         }

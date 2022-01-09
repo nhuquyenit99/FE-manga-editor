@@ -11,5 +11,31 @@
     }
     .menu {
         padding: 15px;
+        .select-eraser-width {
+            width: 120px;
+            background-color: #666;
+            color: white;
+            border: none;
+            height: 40px;
+        
+            .ant-input-number-input-wrap input {
+                height: 40px;
+            }
+        
+            .ant-input-number-handler-wrap {
+                opacity: 1;
+                background-color: #1890ff;
+                background-color: rgba(0, 0, 0, 0.45);
+        
+                .anticon {
+                    color: white;
+                }
+            }
+        }
+        .menu-action {
+            .ant-btn {
+                margin-right: 10px;
+            }
+        }
     }
 }

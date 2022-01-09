@@ -4,10 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, notification, Upload } from 'antd';
 import { DataAccess } from '../../access';
 import { ImageContext } from '../../context';
+import { useHistory } from 'react-router-dom';
 
 export const UploadImageDragger = () => {
     const { setImageUrl } = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
+    const history = useHistory();
     return (
         <Upload.Dragger showUploadList={false} maxCount={1} accept='image/*'
             customRequest={async ({file}) => {
@@ -25,6 +27,7 @@ export const UploadImageDragger = () => {
                             original_filename: res?.data?.original_filename,
                             created_at: res?.data?.created_at
                         }, ...uploadedList]));
+                        history.push('/edit/text');
                     }
                 } catch (e) {
                     notification.error({

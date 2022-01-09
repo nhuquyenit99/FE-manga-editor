@@ -41,3 +41,13 @@ export const TextBoxContext = React.createContext({
     textBoxs: {} as Record<string, TextBoxData>,
     setTextBoxs: (() => {}) as React.Dispatch<React.SetStateAction<Record<string, TextBoxData>>>
 });
+
+
+export const EraserContext = React.createContext({
+    color: 'white',
+    setColor: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+    brushWidth: 10,
+    setBrushWidth: (() => {}) as React.Dispatch<React.SetStateAction<number>>,
+    onUndo: () => {},
+    onClearAll: () => {},
+});

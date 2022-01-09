@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { RGBColor } from 'react-color';
 
 export function mergeClass(...args: (string | undefined | null)[]) {
@@ -26,11 +27,20 @@ export const getSizeFromPixel = (size: string) => {
 };
 
 
-export function getImageMeta(url: any) {
+export function useImageSize(url: string) {
     let img = document.createElement('img');
     img.src = url;
+
+    const [width, setWidth] = useState<number>();
+    const [height, setHeight] = useState<number>();
+
+    img.onload = function()
+    {
+        setWidth(img.naturalWidth);
+        setHeight(img.naturalHeight);
+    };
     return {
-        canvasWidth: img.naturalWidth,
-        canvasHeight: img.naturalHeight
+        canvasWidth: width,
+        canvasHeight: height
     };
 }

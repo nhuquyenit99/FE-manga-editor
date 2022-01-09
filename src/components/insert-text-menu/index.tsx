@@ -8,12 +8,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { defaultCordinate, defaultTextBoxStyle, ListFontFamily } from '../../model';
-import { getColorStrFromRgba, getImageMeta, getRgbaFromString, getSizeFromPixel } from '../../utils';
-import { ImageContext, TextBoxContext } from '../../context';
+import { getColorStrFromRgba, getRgbaFromString, getSizeFromPixel } from '../../utils';
+import { TextBoxContext } from '../../context';
 import './style.scss';
 
 export const InsertTextPanel = () => {
-    const { imageUrl } = useContext(ImageContext);
     const { activeId, setActiveId, setTextBoxs, textBoxs } = useContext(TextBoxContext);
 
     const onAddText = () => {
@@ -119,8 +118,6 @@ export const InsertTextPanel = () => {
         updateActiveTextBoxStyle(newStyle);
     };
 
-    getImageMeta(imageUrl);
-
     return (
         <div className='insert-text-side-bar'>
             <div className='splitter' />
@@ -215,7 +212,6 @@ export const InsertTextPanel = () => {
                         className='select-font-size'
                     />
                 </div>
-
                 <h3>BorderRadius</h3>
                 <div>
                     <InputNumber min={0}
@@ -226,7 +222,6 @@ export const InsertTextPanel = () => {
                 </div>
                 <Button type='primary' shape='round' className='btn-save'>Save</Button>
             </div>
-                    
         </div>
     );
 };

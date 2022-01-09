@@ -4,13 +4,14 @@ import CanvasDraw from 'react-canvas-draw';
 import { Button } from 'antd';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { 
     CropperImagePanel, InsertTextPanel, 
     UploadImageDragger, TextBox, 
     ExportImageModal, EraseMenu 
 } from '../../../components';
-import { ImageContext, TextBoxContext } from '../../../context';
-import { getImageMeta } from '../../../utils';
+import { EraserContext, ImageContext, TextBoxContext } from '../../../context';
+import { useImageSize } from '../../../utils';
 import { TextBoxData } from '../../../model';
 import { EditSideBar } from './side-bar';
 import './style.scss';
@@ -25,9 +26,14 @@ export const EditPage = () => {
 
     const imageRef = useRef<any>();
     const saveModelRef = useRef<any>();
+    const zoomRef = React.createRef<ReactZoomPanPinchRef>();
 
     const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
     const [activeTextBox, setActiveTextBox] = useState<string>('');
+    const [brushWidth, setBrushWidth] = useState(10);
+    const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
+
+    let canvasDrawRef = null as any;
 
     const removeTextBox = (id: string) => {
         let list = {...textBoxs};
@@ -39,6 +45,7 @@ export const EditPage = () => {
     };
 
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.svg') => {
+        zoomRef.current?.resetTransform();
         let dataUrl;
         switch(extension) {
         case '.jpg': 
@@ -61,7 +68,9 @@ export const EditPage = () => {
             original_filename: fileName,
             created_at: moment().toISOString()
         }, ...uploadedList]));
-    },[imageRef]);
+    },[imageRef, zoomRef]);
+
+    const { canvasHeight, canvasWidth } = useImageSize(imageUrl);
 
     if (!panel) {
         return <Redirect to='/edit/text'/>;
@@ -91,6 +100,7 @@ export const EditPage = () => {
         );
     }
     const Panel = EditPanel[panel];
+
     return (
         <div className='edit-page-layout'>
             <EditSideBar 
@@ -119,27 +129,59 @@ export const EditPage = () => {
                             setTextBoxs: setTextBoxs
                         }}
                     >
-                        <Panel />
-                        <div className='workspace'>
-                            <div className='image-to-edit' ref={imageRef}>
-                                {panel === 'erase' ? <CanvasDraw imgSrc={imageUrl}
-                                    {...getImageMeta(imageUrl)}
-                                    brushColor="white"
-                                /> 
-                                    : <img src={imageUrl} alt='img-to-edit' draggable={false}/>
-                                }
-                                {Object.values(textBoxs).map(textBox => (
-                                    <TextBox 
-                                        key={textBox.id}
-                                        data={textBox}
-                                    />
-                                ))}
+                        <EraserContext.Provider value={{
+                            color: brushColor,
+                            setColor: setBrushColor,
+                            brushWidth: brushWidth,
+                            setBrushWidth: setBrushWidth,
+                            onUndo: () => canvasDrawRef?.undo?.(),
+                            onClearAll: () => canvasDrawRef?.eraseAll?.()
+                        }}
+                        >
+                            <Panel />
+                            <div className='workspace'>
+                                <TransformWrapper
+                                    minScale={0.2}
+                                    maxScale={3}
+                                    // disabled
+                                    ref={zoomRef}
+                                >
+                                    {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+                                        <div className='image-wrapper'>
+                                            <TransformComponent>
+                                                <div className='image-to-edit' ref={imageRef}>
+                                                    <CanvasDraw imgSrc={imageUrl ?? ''}
+                                                        canvasHeight={canvasHeight}
+                                                        canvasWidth={canvasWidth}
+                                                        hideGrid
+                                                        ref={canvasDraw => (canvasDrawRef = canvasDraw)}
+                                                        onChange={() => {}}
+                                                        disabled={panel !== 'erase'}
+                                                        brushColor={brushColor}
+                                                        brushRadius={brushWidth}
+                                                    />
+                                                    {Object.values(textBoxs).map(textBox => (
+                                                        <TextBox 
+                                                            key={textBox.id}
+                                                            data={textBox}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </TransformComponent>
+                                            <div className="tools">
+                                                <button onClick={() => zoomIn()}>+</button>
+                                                <button onClick={() => zoomOut()}>-</button>
+                                                <button onClick={() => resetTransform()}>x</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </TransformWrapper>
+                                <ExportImageModal 
+                                    onSave={onExport}
+                                    ref={saveModelRef}
+                                />
                             </div>
-                            <ExportImageModal 
-                                onSave={onExport}
-                                ref={saveModelRef}
-                            />
-                        </div>
+                        </EraserContext.Provider>
                     </TextBoxContext.Provider>
                 </div>
             </div>

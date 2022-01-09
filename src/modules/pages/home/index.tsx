@@ -35,13 +35,13 @@ export function HomePage () {
                                     formData.append('upload_preset', 'yj7nifwi');
                                     const res = await DataAccess.uploadImage(formData);
                                     if (res?.data) {
-                                        setImageUrl(res?.data?.secure_url);
                                         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
                                         localStorage.setItem('uploadedList', JSON.stringify([{
                                             url: res?.data?.secure_url,
                                             original_filename: res?.data?.original_filename,
                                             created_at: res?.data?.created_at
                                         }, ...uploadedList]));
+                                        setImageUrl(res?.data?.secure_url);
                                         history.push('/edit/text');
                                     }
                                 } catch (e) {
