@@ -21,7 +21,7 @@ export const EraseMenu = () => {
     useEffect(() => {
         document.addEventListener('keydown', onUndoViaKeyDown);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[]);
+    },[onUndo]);
 
     return (
         <div className='erase-menu-sidebar'>
