@@ -1,22 +1,19 @@
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef } from 'react';
 import moment from 'moment';
-import CanvasDraw from 'react-canvas-draw';
-import { Button, Tooltip } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Menu, Tooltip } from 'antd';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { 
-    CropperImagePanel, InsertTextPanel, 
-    UploadImageDragger, TextBox, 
-    ExportImageModal, EraseMenu 
+    UploadImageDragger, 
+    ExportImageModal, 
 } from '../../../components';
-import { EraserContext, ImageContext, TextBoxContext } from '../../../context';
-import { useImageSize } from '../../../utils';
-import { TextBoxData } from '../../../model';
-import './style.scss';
+import { ImageContext } from '../../../context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMousePointer, faSearch, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TranslateSideBar } from './side-bar';
+import './style.scss';
 
 
 export const TranslatePage = () => {
@@ -67,7 +64,7 @@ export const TranslatePage = () => {
                         </div>
                     </div>
                     <div className='upload-image-panel'>
-                        <UploadImageDragger />
+                        <UploadImageDragger type='translate'/>
                     </div>
                 </div>
             </div>
@@ -86,34 +83,22 @@ export const TranslatePage = () => {
                             setImageUrl('');
                             history.push('/');
                         }} >Cancel</Button>
-                        {imageUrl && <Button type='primary' onClick={() => {
-                            zoomRef.current?.resetTransform();
-                            saveModelRef.current?.open();
-                        }} shape='round'>
-                            Export
-                        </Button>}
+                        {imageUrl && 
+                        <Dropdown trigger={['click']} overlay={<Menu>
+                            <Menu.Item onClick={() => {
+                                zoomRef.current?.resetTransform();
+                                saveModelRef.current?.open();
+                            }}>
+                                Export
+                            </Menu.Item>
+                        </Menu>}>
+                            <Button shape='round'>Menu <DownOutlined /></Button>
+                        </Dropdown>}
                     </div>
                 </div>
                 <div className='edit-panel-content'>
                     <div className='workspace'>
-                        {/* <div className='change-mode-tool'>
-                            {panel === 'erase' && <>
-                                <Tooltip title='Disable Zoom' placement='right'>
-                                    <button onClick={() => {
-                                        setDisableZoom(true);
-                                        zoomRef.current?.resetTransform();
-                                    }}
-                                    className={disableZoom ? 'active' : ''}
-                                    ><FontAwesomeIcon icon={faMousePointer}/></button>
-                                </Tooltip>
-                                <Tooltip title='Zoom' placement='right'>
-                                    <button onClick={() => setDisableZoom(false)}
-                                        className={disableZoom ? '' : 'active'}
-                                    ><FontAwesomeIcon icon={faSearch}/></button>
-                                </Tooltip>
-                            </>}
-                        </div> */}
-                        <TransformWrapper
+                        {/* <TransformWrapper
                             minScale={0.2}
                             maxScale={3}
                             ref={zoomRef}
@@ -138,34 +123,7 @@ export const TranslatePage = () => {
                                     </div>
                                 </div>
                             )}
-                        </TransformWrapper>
-                        {/* <div className='image-to-edit' ref={imageRef}>
-                            <CanvasDraw imgSrc={imageUrl ?? ''}
-                                canvasHeight={canvasHeight}
-                                canvasWidth={canvasWidth}
-                                hideGrid
-                                ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                                onChange={() => {}}
-                                disabled={panel !== 'erase'}
-                                brushColor={brushColor}
-                                lazyRadius={1}
-                                brushRadius={brushWidth}
-                                //@ts-ignore
-                                enablePanAndZoom={!disableZoom}
-                            />
-                            {Object.values(textBoxs).map(textBox => (
-                                <TextBox 
-                                    key={textBox.id}
-                                    data={textBox}
-                                />
-                            ))}
-                        </div>
-                        {panel === 'erase' && !disableZoom && <div className='tools'>
-                            <button onClick={() => {
-                                canvasDrawRef?.resetView?.();
-                            }}>Reset View
-                            </button>
-                        </div>} */}
+                        </TransformWrapper> */}
                         <ExportImageModal 
                             onSave={onExport}
                             ref={saveModelRef}

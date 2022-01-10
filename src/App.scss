@@ -224,3 +224,23 @@
         }
     }
 }
+
+.custom-dropdown {
+    .ant-dropdown-menu {
+        background-color: #292c31eb;
+        border-radius: 5px;
+        box-shadow: 0px 2px 4px #2F6EA9;
+
+        .anticon {
+            font-size: 16px;
+        }
+
+        .ant-dropdown-menu-item {
+            color: hsla(0, 0%, 100%, .8);
+
+            &:hover {
+                background: linear-gradient(180deg, #00a3da, #09c);
+            }
+        }
+    }
+}

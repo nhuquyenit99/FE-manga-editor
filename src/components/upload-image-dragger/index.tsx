@@ -6,7 +6,7 @@ import { DataAccess } from '../../access';
 import { ImageContext } from '../../context';
 import { useHistory } from 'react-router-dom';
 
-export const UploadImageDragger = () => {
+export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'}) => {
     const { setImageUrl } = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
     const history = useHistory();
@@ -27,7 +27,11 @@ export const UploadImageDragger = () => {
                             original_filename: res?.data?.original_filename,
                             created_at: res?.data?.created_at
                         }, ...uploadedList]));
-                        history.push('/edit/text');
+                        if (type === 'edit') {
+                            history.push('/edit/text');
+                        } else {
+                            history.push('/translate');
+                        }
                     }
                 } catch (e) {
                     notification.error({
@@ -39,7 +43,7 @@ export const UploadImageDragger = () => {
             }}>
             <FontAwesomeIcon icon={faExclamationTriangle}/>
             <div className='title'>
-                Please upload an image to start editing
+                {`Please upload an image to start ${type === 'edit' ? 'editting' : 'translating'}`}
             </div>
             <p className='welcome'>
                 Upload image by clicking on the open photo button, or drag n' drop a file.

@@ -26,7 +26,7 @@ export function HomePage () {
                 <SideBar />
                 <div className='main-content'>
                     <div className='content-box'>
-                        <Upload.Dragger showUploadList={false} maxCount={1} accept='image/*'
+                        <Upload.Dragger showUploadList={false} maxCount={1} accept='image/*,application/pdf'
                             customRequest={async ({file}) => {
                                 try {
                                     setLoading(true);

@@ -1,7 +1,8 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
 import moment from 'moment';
 import CanvasDraw from 'react-canvas-draw';
-import { Button, Tooltip } from 'antd';
+import { Button, Dropdown, Menu, Tooltip } from 'antd';
+import { DownOutlined, ExportOutlined, SaveOutlined, TranslationOutlined } from '@ant-design/icons';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { 
@@ -110,16 +111,33 @@ export const EditPage = () => {
                 <div className='header'>
                     <div className='title'>Edit Page</div>  
                     <div className='suffix'>
+                        {imageUrl && 
+                        <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
+                            <Menu.Item onClick={() => {
+                                canvasDrawRef?.resetView?.();
+                                saveModelRef.current?.open();
+                            }} icon={<ExportOutlined size={16}/>}>
+                                Export
+                            </Menu.Item>
+                            <Menu.Item onClick={() => {
+                                canvasDrawRef?.resetView?.();
+                                saveModelRef.current?.open();
+                            }} icon={<SaveOutlined size={16}/>}>
+                                Save
+                            </Menu.Item>
+                            <Menu.Item onClick={() => {
+                                // canvasDrawRef?.resetView?.();
+                                history.push('/translate');
+                            }} icon={<TranslationOutlined size={16}/>}>
+                                Auto-Translate
+                            </Menu.Item>
+                        </Menu>}>
+                            <Button type='primary' shape='round' className='menu-action'>Menu <DownOutlined/></Button>
+                        </Dropdown>}
                         <Button shape='round' onClick={() => {
                             setImageUrl('');
                             history.push('/');
                         }} >Cancel</Button>
-                        {imageUrl && <Button type='primary' onClick={() => {
-                            canvasDrawRef?.resetView?.();
-                            saveModelRef.current?.open();
-                        }} shape='round'>
-                            Export
-                        </Button>}
                     </div>
                 </div>
                 <div className='edit-panel-content'>
@@ -203,7 +221,7 @@ export const EditPage = () => {
                                     ))}
                                 </div>
                                 {panel === 'erase' && !disableZoom && <div className='tools'>
-                                    <button onClick={() => {
+                                    <button className='btn-reset-view' onClick={() => {
                                         canvasDrawRef?.resetView?.();
                                     }}>Reset View
                                     </button>
