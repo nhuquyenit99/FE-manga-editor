@@ -6,13 +6,18 @@
         margin-top: 70px;
         row-gap: 30px;
         column-gap: 30px;
+
         .image-item {
             color: hsla(0, 0%, 100%, .8);
             text-align: center;
+            width: 300px;
+
             .name {
                 margin-top: 10px;
                 font-weight: bold;
+                word-break: break-all;
             }
+
             .image-wrapper {
                 width: 300px;
                 height: 450px;
@@ -25,11 +30,12 @@
                 box-shadow: 5px 2px 8px 2px #888888;
                 cursor: pointer;
                 position: relative;
+
                 img {
                     height: 100%;
                     width: auto;
                 }
-    
+
                 .hover-text {
                     position: absolute;
                     background: #111;
@@ -44,6 +50,7 @@
                     font-size: 32px;
                     font-family: 'Comic-2';
                 }
+
                 &:hover {
                     .hover-text {
                         display: flex;
@@ -54,11 +61,13 @@
             }
         }
     }
+
     .main-content .title {
         color: hsla(0, 0%, 100%, .8);
         font-family: 'Astro-City';
         font-size: 42px;
         text-align: center;
+
         &::after {
             background-color: #00a3da;
             content: " ";
@@ -70,6 +79,7 @@
             margin-right: auto;
         }
     }
+
     .no-data-panel {
         display: flex;
         justify-content: center;

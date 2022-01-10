@@ -4,7 +4,6 @@ import CanvasDraw from 'react-canvas-draw';
 import { Button, Tooltip } from 'antd';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
-import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { 
     CropperImagePanel, InsertTextPanel, 
     UploadImageDragger, TextBox, 
@@ -14,9 +13,9 @@ import { EraserContext, ImageContext, TextBoxContext } from '../../../context';
 import { useImageSize } from '../../../utils';
 import { TextBoxData } from '../../../model';
 import { EditSideBar } from './side-bar';
-import './style.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMousePointer, faSearch, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faMousePointer, faSearch } from '@fortawesome/free-solid-svg-icons';
+import './style.scss';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -28,7 +27,6 @@ export const EditPage = () => {
 
     const imageRef = useRef<any>();
     const saveModelRef = useRef<any>();
-    const zoomRef = React.createRef<ReactZoomPanPinchRef>();
 
     const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
     const [activeTextBox, setActiveTextBox] = useState<string>('');
@@ -48,7 +46,6 @@ export const EditPage = () => {
     };
 
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.svg') => {
-        canvasDrawRef?.resetView?.();
         let dataUrl;
         switch(extension) {
         case '.jpg': 
@@ -118,7 +115,7 @@ export const EditPage = () => {
                             history.push('/');
                         }} >Cancel</Button>
                         {imageUrl && <Button type='primary' onClick={() => {
-                            zoomRef.current?.resetTransform();
+                            canvasDrawRef?.resetView?.();
                             saveModelRef.current?.open();
                         }} shape='round'>
                             Export
@@ -151,7 +148,7 @@ export const EditPage = () => {
                                         <Tooltip title='Disable Zoom' placement='right'>
                                             <button onClick={() => {
                                                 setDisableZoom(true);
-                                                zoomRef.current?.resetTransform();
+                                                canvasDrawRef?.resetView?.();
                                             }}
                                             className={disableZoom ? 'active' : ''}
                                             ><FontAwesomeIcon icon={faMousePointer}/></button>
@@ -161,8 +158,6 @@ export const EditPage = () => {
                                                 className={disableZoom ? '' : 'active'}
                                             ><FontAwesomeIcon icon={faSearch}/></button>
                                         </Tooltip>
-                            
-                                        
                                     </>}
                                 </div>
                                 {/*<TransformWrapper
