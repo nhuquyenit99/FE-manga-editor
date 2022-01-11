@@ -1,3 +1,5 @@
+import { StringMappingType } from 'typescript';
+
 export const defaultUploadResponse = {
     'asset_id': '7505885fe2b117f0c39485f611954493',
     'public_id': 'i3bbku0qmjotesls6cfe',
@@ -25,5 +27,6 @@ export type UploadResponse = typeof defaultUploadResponse;
 export type FileData = {
     url: string
     original_filename: string
-    created_at: string
+    created_at: string, 
+    type: string
 }

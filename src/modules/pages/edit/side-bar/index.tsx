@@ -8,6 +8,7 @@ import { ImageContext } from '../../../../context';
 import { mergeClass } from '../../../../utils';
 import { DataAccess } from '../../../../access';
 import './style.scss';
+import { RcFile } from 'antd/lib/upload';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -17,19 +18,19 @@ type EditSidebarProps = {
 
 export const EditSideBar = ({action}: EditSidebarProps) => {
     const history = useHistory();
-    const { setImageUrl, imageUrl } = useContext(ImageContext);
+    const { setCurrentImage, currentImage } = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
     return (
         <div className='edit-side-bar'>
             <div className='home-button' onClick={() => {
-                setImageUrl('');
+                setCurrentImage(undefined);
                 history.push('/');
             }}>
                 <FontAwesomeIcon icon={faHome}/>
             </div>
             <div className='splitter'/>
             <div className='menu'>
-                {imageUrl && <><Popover content='Add text' key='text' overlayClassName='custom-tooltip' placement='right'>
+                {currentImage && <><Popover content='Add text' key='text' overlayClassName='custom-tooltip' placement='right'>
                     <div className={mergeClass('menu-button', action ==='text' ? 'active' : '')} 
                         onClick={() => history.push('/edit/text')}>
                         <FontAwesomeIcon icon={faFont}/>
@@ -56,7 +57,7 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                 </>}
             </div>
             <div className='splitter'/>
-            <Upload className='side-bar-upload' showUploadList={false} maxCount={1} accept='image/*'
+            <Upload className='side-bar-upload' showUploadList={false} maxCount={1} accept='image/*,application/pdf'
                 customRequest={async ({file}) => {
                     try {
                         setLoading(true);
@@ -65,12 +66,16 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                         formData.append('upload_preset', 'yj7nifwi');
                         const res = await DataAccess.uploadImage(formData);
                         if (res?.data) {
-                            setImageUrl(res?.data?.secure_url);
+                            setCurrentImage({
+                                url: res?.data?.secure_url, 
+                                type: (file as RcFile).type
+                            });
                             const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
                             localStorage.setItem('uploadedList', JSON.stringify([{
                                 url: res?.data?.secure_url,
                                 original_filename: res?.data?.original_filename,
-                                created_at: res?.data?.created_at
+                                created_at: res?.data?.created_at,
+                                type: (file as RcFile).type
                             }, ...uploadedList]));
                         }
                     } catch (e) {

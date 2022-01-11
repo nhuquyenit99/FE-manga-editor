@@ -7,12 +7,13 @@ import { mergeClass } from '../../utils';
 import { ImageContext } from '../../context';
 import { DataAccess } from '../../access';
 import './style.scss';
+import { RcFile } from 'antd/lib/upload';
 
 export const SideBar = () => {
     const history = useHistory();
     const pathName = history.location.pathname;
 
-    const {setImageUrl} = useContext(ImageContext);
+    const {setCurrentImage} = useContext(ImageContext);
 
     const [loading, setLoading] = useState(false);
 
@@ -27,15 +28,15 @@ export const SideBar = () => {
                     <FontAwesomeIcon icon={faHome}/>
                     <b>HOME</b>
                 </Link>
-                <Link className={mergeClass('menu-button', pathName === '/translate' ? 'active' : '')}  
+                {/* <Link className={mergeClass('menu-button', pathName === '/translate' ? 'active' : '')}  
                     to='/translate' key='/translate'>
                     <FontAwesomeIcon icon={faGlobe}/>
                     <b>TRANS</b>
-                </Link>
+                </Link> */}
                 <Link className={mergeClass('menu-button', pathName === '/edit' ? 'active' : '')}  
                     to='/edit' key='/edit'>
                     <FontAwesomeIcon icon={faPenNib}/>
-                    <b>EDIT</b>
+                    <b>EDITOR</b>
                 </Link>
                 <Link className={mergeClass('menu-button', pathName === '/history' ? 'active' : '')} 
                     to='/history' key='/history'>
@@ -44,7 +45,7 @@ export const SideBar = () => {
                 </Link>
             </div>
             <div className='splitter'/>
-            <Upload className='side-bar-upload' showUploadList={false} maxCount={1} accept='image/*'
+            <Upload className='side-bar-upload' showUploadList={false} maxCount={1} accept='image/*,application/pdf'
                 customRequest={async ({file}) => {
                     try {
                         setLoading(true);
@@ -53,12 +54,16 @@ export const SideBar = () => {
                         formData.append('upload_preset', 'yj7nifwi');
                         const res = await DataAccess.uploadImage(formData);
                         if (res?.data) {
-                            setImageUrl(res?.data?.secure_url);
+                            setCurrentImage({
+                                url: res?.data?.secure_url, 
+                                type: (file as RcFile).type
+                            });
                             const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
                             localStorage.setItem('uploadedList', JSON.stringify([{
                                 url: res?.data?.secure_url,
                                 original_filename: res?.data?.original_filename,
-                                created_at: res?.data?.created_at
+                                created_at: res?.data?.created_at,
+                                type: (file as RcFile).type
                             }, ...uploadedList]));
                             history.push('/edit/text');
                         }

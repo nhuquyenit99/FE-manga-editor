@@ -1,16 +1,19 @@
 import React, { useContext, useState } from 'react';
 import { Button, notification, Upload } from 'antd';
 import { useHistory } from 'react-router-dom';
-import { SideBar } from '../../../components';
+import { LoadingFullView, SideBar } from '../../../components';
 import backgroundImage from '../../../assets/bg-img.png';
 import { DataAccess } from '../../../access';
 import { ImageContext } from '../../../context';
 import { FileData } from '../../../model';
-import './style.scss';
 import moment from 'moment';
+import { RcFile } from 'antd/lib/upload';
+import { Document, Page, pdfjs } from 'react-pdf';
+import './style.scss';
 
 export function HomePage () {
-    const {setImageUrl} = useContext(ImageContext);
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    const {setCurrentImage} = useContext(ImageContext);
     const history = useHistory();
 
     const [loading, setLoading] = useState(false);
@@ -36,12 +39,16 @@ export function HomePage () {
                                     const res = await DataAccess.uploadImage(formData);
                                     if (res?.data) {
                                         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
+                                        setCurrentImage({
+                                            url: res?.data?.secure_url,
+                                            type: (file as RcFile).type
+                                        });
                                         localStorage.setItem('uploadedList', JSON.stringify([{
                                             url: res?.data?.secure_url,
                                             original_filename: res?.data?.original_filename,
-                                            created_at: res?.data?.created_at
+                                            created_at: res?.data?.created_at,
+                                            type: (file as RcFile).type
                                         }, ...uploadedList]));
-                                        setImageUrl(res?.data?.secure_url);
                                         history.push('/edit/text');
                                     }
                                 } catch (e) {
@@ -64,17 +71,29 @@ export function HomePage () {
                     </div>
                     {lastestProjects.length !== 0 && <div className='lastest-projects'>
                         <div className='title'>
-                            Lastest Projects
+                            Latest Projects
                         </div>
                         <div className='list-images'>
                             {lastestProjects.map(item => (
                                 <div className='image-item' key={item.created_at} onClick={() => {
-                                    setImageUrl(item.url);
+                                    setCurrentImage({
+                                        url: item.url,
+                                        type: item.type
+                                    });
                                     history.push('/edit/text');
                                 }}>
                                     <div className='image-wrapper'>
                                         {/* eslint-disable-next-line jsx-a11y/img-redundant-alt*/}
-                                        <img src={item.url} alt='Image'/>
+                                        {item.type === 'application/pdf' 
+                                            ? <Document
+                                                file={item.url}
+                                                loading={() => <LoadingFullView/>}
+                                            >
+                                                <Page pageNumber={1} scale={1} width={200} height={300}/>
+                                                {/* {canvasUrl && <img src={canvasUrl} alt='img-editable'/>} */}
+                                            </Document>
+                                            : <img src={item.url} alt='uploaded-file'/>
+                                        }
                                         <div className='hover-text'>Continue editting image</div>
                                     </div>
                                     <div className='name'>{item.original_filename ?? 'Image File'}</div>

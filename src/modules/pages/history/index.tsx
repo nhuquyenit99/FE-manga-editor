@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import moment from 'moment';
+import { Document, Page, pdfjs } from 'react-pdf';
 import { useHistory } from 'react-router-dom';
-import { SideBar } from '../../../components';
+import { LoadingFullView, SideBar } from '../../../components';
 import { ImageContext } from '../../../context';
 import { FileData } from '../../../model';
 import NoDataFoundPng from '../../../assets/nodata-found.png';
@@ -9,7 +10,8 @@ import './style.scss';
 
 
 export function HistoryPage () {
-    const { setImageUrl } = useContext(ImageContext);
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    const { setCurrentImage } = useContext(ImageContext);
     const history = useHistory();
 
     const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '[]') as FileData[];
@@ -26,12 +28,23 @@ export function HistoryPage () {
                     <div className='list-uploaded'>
                         {listUploaded.length > 0 ? listUploaded.map((item, idx) => (
                             <div className='image-item' key={item.created_at} onClick={() => {
-                                setImageUrl(item.url);
+                                setCurrentImage({
+                                    url: item.url,
+                                    type: item.type
+                                });
                                 history.push('/edit/text');
                             }}>
                                 <div className='image-wrapper'>
-                                    {/* eslint-disable-next-line jsx-a11y/img-redundant-alt*/}
-                                    <img src={item.url} alt='Image'/>
+                                    {item.type === 'application/pdf' 
+                                        ? <Document
+                                            file={item.url}
+                                            loading={() => <LoadingFullView/>}
+                                        >
+                                            <Page pageNumber={1} scale={1} width={300} height={450}/>
+                                            {/* {canvasUrl && <img src={canvasUrl} alt='img-editable'/>} */}
+                                        </Document>
+                                        : <img src={item.url} alt='uploaded-file'/>
+                                    }
                                     <div className='hover-text'>Continue editting image</div>
                                 </div>
                                 <div className='name'>{item.original_filename ?? 'Image File'}</div>

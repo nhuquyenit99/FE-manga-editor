@@ -1,33 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { TextBoxData } from '../model';
 
-type ImageContextType = {
-    imageUrl: string
-    setImageUrl: (url: string) => void
+type ImageContextState = {
+    url: string
+    type: string
 }
 
-export const ImageContext = React.createContext<ImageContextType>({
-    imageUrl: '',
-    setImageUrl: () => {}
+export const ImageContext = React.createContext({
+    currentImage: undefined as ImageContextState|undefined,
+    setCurrentImage: (fileData?: ImageContextState) => {}
 });
 
 export function ImageContextProvider ({children}: {children: React.ReactNode}) {
-    const [imageUrl, setImageUrl] = useState('');
+    const [currentImage, setCurrentImage] = useState<ImageContextState>();
 
     useEffect(() => {
-        const imageUrl = localStorage.getItem('imageUrl');
-        setImageUrl(imageUrl ?? '');
+        const image = JSON.parse(localStorage.getItem('currentImage') ?? ' {}');
+        setCurrentImage(image);
     },[]);
 
-    const updateImageUrl = (url: string) => {
-        setImageUrl(url);
-        localStorage.setItem('imageUrl', url);
+    const updateCurrentImage = (fileData?: ImageContextState) => {
+        setCurrentImage(fileData);
+        if (fileData) {
+            localStorage.setItem('currentImage', JSON.stringify(fileData));
+        } else {
+            localStorage.removeItem('currentImage');
+        }
     };
 
     return (
         <ImageContext.Provider value={{
-            imageUrl: imageUrl,
-            setImageUrl: updateImageUrl
+            currentImage: currentImage,
+            setCurrentImage: updateCurrentImage
         }}>
             {children}
         </ImageContext.Provider >

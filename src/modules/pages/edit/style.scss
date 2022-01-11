@@ -172,11 +172,12 @@
                         width: 40px;
 
                         &.active {
-                            background-color: #1890ff;
+                            background: linear-gradient(180deg, #00a3da, #09c);
                         }
 
                         &:hover {
-                            background-color: #0074d9;
+                            background: linear-gradient(180deg, #00a3da, #09c);
+                            opacity: 0.7;
                         }
                     }
                 }
@@ -194,12 +195,4 @@
             }
         }
     }
-
-    // .menu-action {
-
-    //     .anticon-down {
-    //         font-size: 14px;
-    //         // line-height: 32px;
-    //     }
-    // }
 }

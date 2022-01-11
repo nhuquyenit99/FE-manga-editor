@@ -16,8 +16,8 @@ const defaultSrc =
   'https://raw.githubusercontent.com/roadmanfong/react-cropper/master/example/img/child.jpg';
 
 export const CropperImagePanel = () => {
-    const {imageUrl} = useContext(ImageContext);
-    const [image, setImage] = useState(imageUrl);
+    // const {imageUrl} = useContext(ImageContext);
+    const [image, setImage] = useState(defaultSrc);
     const [cropData, setCropData] = useState('');
     const [cropper, setCropper] = useState<any>();
     const [mode, setMode] = useState<'move'| 'crop'>('move');

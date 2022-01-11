@@ -8,7 +8,7 @@ import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { 
     CropperImagePanel, InsertTextPanel, 
     UploadImageDragger, TextBox, 
-    ExportImageModal, EraseMenu 
+    ExportImageModal, EraseMenu, PDFViewer 
 } from '../../../components';
 import { EraserContext, ImageContext, TextBoxContext } from '../../../context';
 import { useImageSize } from '../../../utils';
@@ -21,7 +21,7 @@ import './style.scss';
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
 export const EditPage = () => {
-    const { imageUrl, setImageUrl } = useContext(ImageContext);
+    const { currentImage, setCurrentImage } = useContext(ImageContext);
 
     let { panel } = useParams<{panel: EditAction}>();
     const history = useHistory();
@@ -71,13 +71,14 @@ export const EditPage = () => {
         }, ...uploadedList]));
     },[imageRef]);
 
-    const { canvasHeight, canvasWidth } = useImageSize(imageUrl);
+    const { canvasHeight, canvasWidth } = useImageSize(currentImage?.url ?? '');
+    console.log('🚀 ~ file: index.tsx ~ line 76 ~ EditPage ~ currentImage', currentImage);
 
     if (!panel) {
         return <Redirect to='/edit/text'/>;
     }
 
-    if (!imageUrl) {
+    if (!currentImage) {
         return (
             <div className='edit-page-layout'>
                 <EditSideBar 
@@ -88,7 +89,7 @@ export const EditPage = () => {
                         <div className='title'>Edit Page</div>  
                         <div className='suffix'>
                             <Button shape='round' onClick={() => {
-                                setImageUrl('');
+                                setCurrentImage(undefined);
                                 history.push('/');
                             }} >Cancel</Button>
                         </div>
@@ -111,7 +112,7 @@ export const EditPage = () => {
                 <div className='header'>
                     <div className='title'>Edit Page</div>  
                     <div className='suffix'>
-                        {imageUrl && 
+                        {currentImage && 
                         <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
                             <Menu.Item onClick={() => {
                                 canvasDrawRef?.resetView?.();
@@ -135,7 +136,7 @@ export const EditPage = () => {
                             <Button type='primary' shape='round' className='menu-action'>Menu <DownOutlined/></Button>
                         </Dropdown>}
                         <Button shape='round' onClick={() => {
-                            setImageUrl('');
+                            setCurrentImage(undefined);
                             history.push('/');
                         }} >Cancel</Button>
                     </div>
@@ -199,33 +200,42 @@ export const EditPage = () => {
                                         </div>
                                     )}
                                 </TransformWrapper> */}
-                                <div className='image-to-edit' ref={imageRef}>
-                                    <CanvasDraw imgSrc={imageUrl ?? ''}
-                                        canvasHeight={canvasHeight}
-                                        canvasWidth={canvasWidth}
-                                        hideGrid
-                                        ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                                        onChange={() => {}}
-                                        disabled={panel !== 'erase'}
-                                        brushColor={brushColor}
-                                        lazyRadius={1}
-                                        brushRadius={brushWidth}
-                                        //@ts-ignore
-                                        enablePanAndZoom={!disableZoom}
+                                {currentImage.type === 'application/pdf' 
+                                    ? <PDFViewer url={currentImage.url}
+                                        canvasDrawRef={canvasDrawRef}
+                                        imageRef={imageRef}
+                                        panel={panel}
+                                        disableZoom={disableZoom}
                                     />
-                                    {Object.values(textBoxs).map(textBox => (
-                                        <TextBox 
-                                            key={textBox.id}
-                                            data={textBox}
+                                    :<><div className='image-to-edit' ref={imageRef}>
+                                        <CanvasDraw imgSrc={currentImage.url ?? ''}
+                                            canvasHeight={canvasHeight}
+                                            canvasWidth={canvasWidth}
+                                            hideGrid
+                                            ref={canvasDraw => (canvasDrawRef = canvasDraw)}
+                                            onChange={() => {}}
+                                            disabled={panel !== 'erase'}
+                                            brushColor={brushColor}
+                                            lazyRadius={1}
+                                            brushRadius={brushWidth}
+                                            //@ts-ignore
+                                            enablePanAndZoom={!disableZoom}
                                         />
-                                    ))}
-                                </div>
-                                {panel === 'erase' && !disableZoom && <div className='tools'>
-                                    <button className='btn-reset-view' onClick={() => {
-                                        canvasDrawRef?.resetView?.();
-                                    }}>Reset View
-                                    </button>
-                                </div>}
+                                        {Object.values(textBoxs).map(textBox => (
+                                            <TextBox 
+                                                key={textBox.id}
+                                                data={textBox}
+                                            />
+                                        ))}
+                                    </div>
+                                    {panel === 'erase' && !disableZoom && <div className='tools'>
+                                        <button className='btn-reset-view' onClick={() => {
+                                            canvasDrawRef?.resetView?.();
+                                        }}>Reset View
+                                        </button>
+                                    </div>
+                                    }</>
+                                }
                                 <ExportImageModal 
                                     onSave={onExport}
                                     ref={saveModelRef}

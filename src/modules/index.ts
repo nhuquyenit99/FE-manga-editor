@@ -1,5 +1,5 @@
 import { Module } from '../core';
-import { EditPage, HistoryPage, HomePage, TranslatePage } from './pages';
+import { EditPage, HistoryPage, HomePage } from './pages';
 
 export function setup(module: Module) {
     console.log('Setup App');
@@ -17,11 +17,6 @@ export function setup(module: Module) {
         path: '/edit',
         exact: true,
         component: EditPage,
-    });
-    module.route({
-        path: '/translate',
-        exact: true,
-        component: TranslatePage,
     });
     module.route({
         path: '/edit/:panel',

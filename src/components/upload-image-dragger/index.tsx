@@ -5,13 +5,14 @@ import { Button, notification, Upload } from 'antd';
 import { DataAccess } from '../../access';
 import { ImageContext } from '../../context';
 import { useHistory } from 'react-router-dom';
+import { RcFile } from 'antd/lib/upload';
 
 export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'}) => {
-    const { setImageUrl } = useContext(ImageContext);
+    const { setCurrentImage } = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
     const history = useHistory();
     return (
-        <Upload.Dragger showUploadList={false} maxCount={1} accept='image/*'
+        <Upload.Dragger showUploadList={false} maxCount={1} accept='image/*,application/pdf'
             customRequest={async ({file}) => {
                 try {
                     setLoading(true);
@@ -20,12 +21,16 @@ export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'
                     formData.append('upload_preset', 'yj7nifwi');
                     const res = await DataAccess.uploadImage(formData);
                     if (res?.data) {
-                        setImageUrl(res?.data?.secure_url);
+                        setCurrentImage({
+                            url: res?.data?.secure_url, 
+                            type: (file as RcFile).type
+                        });
                         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
                         localStorage.setItem('uploadedList', JSON.stringify([{
                             url: res?.data?.secure_url,
                             original_filename: res?.data?.original_filename,
-                            created_at: res?.data?.created_at
+                            created_at: res?.data?.created_at,
+                            type: (file as RcFile).type
                         }, ...uploadedList]));
                         if (type === 'edit') {
                             history.push('/edit/text');

@@ -1,13 +1,14 @@
 .insert-text-side-bar {
-    width: 400px;
+    width: 300px;
     height: 100%;
     background-color: #292c31eb;
+
     .text-tool-menu {
         height: 100%;
-        width: 400px;
+        width: 300px;
         color: white;
         padding: 15px;
-    
+
         .btn-add-text {
             cursor: pointer;
             margin-bottom: 15px;
@@ -19,71 +20,71 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-    
+
             .fa-font {
                 font-size: 32px;
             }
-    
+
             .label {
                 font-size: 20px;
                 font-weight: bold;
             }
-    
+
             .description {
                 font-size: 13px;
             }
         }
-    
+
         h3 {
             color: white;
-    
+
             &:not(:first-child) {
                 margin-top: 20px;
             }
         }
-    
+
         .style-menu {
             display: flex;
             column-gap: 10px;
-    
+
             .ant-btn {
                 color: white;
                 border: none;
                 width: 50px;
                 height: 40px;
                 font-size: 16px;
-    
+
                 &:not(.ant-btn-primary) {
                     background-color: #666;
                 }
             }
         }
-    
+
         .sketch-picker {
             color: rgba(0, 0, 0, 0.85);
         }
     }
-    
+
     .btn-save {
         margin-top: 20px;
     }
-    
+
     .select-font-size {
         width: 120px;
         background-color: #666;
         color: white;
         border: none;
         height: 40px;
-    
+
         .ant-input-number-input-wrap input {
             height: 40px;
         }
-    
+
         .ant-input-number-handler-wrap {
             opacity: 1;
             background-color: #1890ff;
             background-color: rgba(0, 0, 0, 0.45);
-    
+
             .anticon {
                 color: white;
             }
