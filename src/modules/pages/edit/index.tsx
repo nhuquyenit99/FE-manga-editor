@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import moment from 'moment';
 import CanvasDraw from 'react-canvas-draw';
 import { Button, Dropdown, Menu, Tooltip } from 'antd';
@@ -34,6 +34,7 @@ export const EditPage = () => {
     const [brushWidth, setBrushWidth] = useState(10);
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
     const [disableZoom, setDisableZoom] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
 
     let canvasDrawRef = null as any;
 
@@ -72,7 +73,10 @@ export const EditPage = () => {
     },[imageRef]);
 
     const { canvasHeight, canvasWidth } = useImageSize(currentImage?.url ?? '');
-    console.log('🚀 ~ file: index.tsx ~ line 76 ~ EditPage ~ currentImage', currentImage);
+
+    useEffect(() => {
+        setTextBoxs({});
+    },[currentImage]);
 
     if (!panel) {
         return <Redirect to='/edit/text'/>;
@@ -148,7 +152,9 @@ export const EditPage = () => {
                             setActiveId: setActiveTextBox,
                             removeTextBox: removeTextBox,
                             textBoxs: textBoxs,
-                            setTextBoxs: setTextBoxs
+                            setTextBoxs: setTextBoxs,
+                            currentPage: currentPage,
+                            setCurrentPage: setCurrentPage
                         }}
                     >
                         <EraserContext.Provider value={{

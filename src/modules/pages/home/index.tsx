@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { Button, notification, Upload } from 'antd';
-import { useHistory } from 'react-router-dom';
-import { LoadingFullView, SideBar } from '../../../components';
-import backgroundImage from '../../../assets/bg-img.png';
-import { DataAccess } from '../../../access';
-import { ImageContext } from '../../../context';
-import { FileData } from '../../../model';
 import moment from 'moment';
 import { RcFile } from 'antd/lib/upload';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { Button, notification, Upload } from 'antd';
+import { useHistory } from 'react-router-dom';
+import { LoadingFullView, SideBar } from '../../../components';
+import { DataAccess } from '../../../access';
+import { ImageContext } from '../../../context';
+import { FileData } from '../../../model';
+import backgroundImage from '../../../assets/bg-img.png';
 import './style.scss';
 
 export function HomePage () {

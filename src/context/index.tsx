@@ -43,6 +43,8 @@ export const TextBoxContext = React.createContext({
     setActiveId: (id: string) => {},
     removeTextBox: (id: string) => {},
     textBoxs: {} as Record<string, TextBoxData>,
+    currentPage:  1,
+    setCurrentPage: (page: number) => {},
     setTextBoxs: (() => {}) as React.Dispatch<React.SetStateAction<Record<string, TextBoxData>>>
 });
 

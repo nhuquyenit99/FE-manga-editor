@@ -13,7 +13,7 @@ import { TextBoxContext } from '../../context';
 import './style.scss';
 
 export const InsertTextPanel = () => {
-    const { activeId, setActiveId, setTextBoxs, textBoxs } = useContext(TextBoxContext);
+    const { activeId, setActiveId, setTextBoxs, textBoxs, currentPage } = useContext(TextBoxContext);
 
     const onAddText = () => {
         const id = _.uniqueId();
@@ -27,7 +27,8 @@ export const InsertTextPanel = () => {
                         x: defaultCordinate.x + Object.keys(textBoxs).length * 10,
                         y: defaultCordinate.y + Object.keys(textBoxs).length * 10,
                     },
-                    style: {...defaultTextBoxStyle}
+                    style: {...defaultTextBoxStyle},
+                    page: currentPage
                 }
             };
         });

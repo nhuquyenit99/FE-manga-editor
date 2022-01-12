@@ -19,4 +19,5 @@ export type TextBoxData = {
     id: string,
     style: React.CSSProperties,
     coordinates: Cordinate
+    page: number
 }

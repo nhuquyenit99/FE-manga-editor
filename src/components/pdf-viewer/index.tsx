@@ -1,17 +1,15 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react';
-import { notification, Spin } from 'antd';
+import React, { useRef, useState, useEffect, useContext } from 'react';
+import CanvasDraw from 'react-canvas-draw';
+import { notification } from 'antd';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import './style.scss';
-import CanvasDraw from 'react-canvas-draw';
-import { useContext } from 'react';
+import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons';
 import { EraserContext, ImageContext, TextBoxContext } from '../../context';
+import { LoadingFullView } from '../loading';
 import { useImageSize } from '../../utils';
 import { TextBox } from '../text-box';
-import { LoadingFullView } from '..';
-
+import './style.scss';
 
 type PDFViewerProps = {
     url: string,
@@ -24,9 +22,9 @@ type PDFViewerProps = {
 export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disableZoom = true }: PDFViewerProps) {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-    const { currentImage, setCurrentImage } = useContext(ImageContext);
+    const { currentImage } = useContext(ImageContext);
     const { brushWidth, color: brushColor  } = useContext(EraserContext);
-    const { textBoxs, activeId } = useContext(TextBoxContext);
+    const { textBoxs, setCurrentPage } = useContext(TextBoxContext);
 
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState(1);
@@ -44,6 +42,7 @@ export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disabl
 
     const changePage = (offset: number) => {
         setPageLoaded(false);
+        setCurrentPage(pageNumber + offset);
         setPageNumber(prevPageNumber => prevPageNumber + offset);
     };
 
@@ -62,7 +61,6 @@ export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disabl
     },[pageNumber, canvasRef, rehydrate, pageLoaded]);
 
     const { canvasHeight, canvasWidth } = useImageSize(canvasUrl ?? '');
-    console.log('🚀 ~ file: index.tsx ~ line 64 ~ PDFViewer ~ canvasHeight, canvasWidth', canvasHeight, canvasWidth);
 
     return (
         <div className="pdf-viewer">
@@ -131,12 +129,14 @@ export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disabl
                         //@ts-ignore
                         enablePanAndZoom={!disableZoom}
                     />
-                    {Object.values(textBoxs).map(textBox => (
-                        <TextBox 
-                            key={textBox.id}
-                            data={textBox}
-                        />
-                    ))}
+                    {Object.values(textBoxs).filter(item => item.page === pageNumber)
+                        .map(textBox => (
+                            <TextBox 
+                                key={textBox.id}
+                                data={textBox}
+                            />
+                        ))
+                    }
                 </div>
                 {panel === 'erase' && !disableZoom && <div className='tools'>
                     <button className='btn-reset-view' onClick={() => {
