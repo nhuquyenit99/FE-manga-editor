@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { notification } from 'antd';
 import { PDFDocumentProxy } from 'pdfjs-dist';
@@ -13,13 +13,14 @@ import './style.scss';
 
 type PDFViewerProps = {
     url: string,
-    canvasDrawRef: any
     imageRef: any
     panel: 'crop' | 'text' | 'draw' | 'erase';
     disableZoom?: boolean
 }
 
-export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disableZoom = true }: PDFViewerProps) {
+export const PDFViewer = forwardRef(({ 
+    url, imageRef, panel = 'text', disableZoom = true 
+}: PDFViewerProps, ref) =>  {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
     const { currentImage } = useContext(ImageContext);
@@ -35,10 +36,16 @@ export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disabl
     const canvasRef = useRef<HTMLCanvasElement|null>(null);
     const [canvasUrl, setCanvasUrl] = useState<string>();
 
+    let canvasDrawRef = null as any;
     /*To Prevent right click on screen*/
-    document.addEventListener('contextmenu', (event) => {
-        event.preventDefault();
-    });
+    // document.addEventListener('contextmenu', (event) => {
+    //     event.preventDefault();
+    // });
+
+    useImperativeHandle(ref, () => ({
+        undo: canvasDrawRef?.undo,
+        clear: canvasDrawRef?.clear
+    }));
 
     const changePage = (offset: number) => {
         setPageLoaded(false);
@@ -148,4 +155,4 @@ export function PDFViewer({ url, canvasDrawRef, imageRef, panel = 'text', disabl
             </div>
         </div>
     );
-}
+});

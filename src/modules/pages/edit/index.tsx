@@ -35,8 +35,10 @@ export const EditPage = () => {
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
     const [disableZoom, setDisableZoom] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    // const [pdfCanvasDraw, setPdfCanvasDraw] = useState();
 
     let canvasDrawRef = null as any;
+    let PDFViewerRef = React.createRef<any>();
 
     const removeTextBox = (id: string) => {
         let list = {...textBoxs};
@@ -106,6 +108,7 @@ export const EditPage = () => {
         );
     }
     const Panel = EditPanel[panel];
+    console.log('🚀 ~ file: index.tsx ~ line 123 ~ EditPage ~ canvasDrawRef', canvasDrawRef);
 
     return (
         <div className='edit-page-layout'>
@@ -162,8 +165,20 @@ export const EditPage = () => {
                             setColor: setBrushColor,
                             brushWidth: brushWidth,
                             setBrushWidth: setBrushWidth,
-                            onUndo: () => canvasDrawRef?.undo?.(),
-                            onClearAll: () => canvasDrawRef?.clear?.()
+                            onUndo: () => {
+                                if (currentImage.type === 'application/pdf') {
+                                    PDFViewerRef.current?.undo();
+                                } else {
+                                    canvasDrawRef?.undo?.();
+                                }
+                            } ,
+                            onClearAll: () => {
+                                if (currentImage.type === 'application/pdf') {
+                                    PDFViewerRef.current?.clear();
+                                } else {
+                                    canvasDrawRef?.clear?.();
+                                }
+                            }
                         }}
                         >
                             <Panel />
@@ -208,7 +223,7 @@ export const EditPage = () => {
                                 </TransformWrapper> */}
                                 {currentImage.type === 'application/pdf' 
                                     ? <PDFViewer url={currentImage.url}
-                                        canvasDrawRef={canvasDrawRef}
+                                        ref={PDFViewerRef}
                                         imageRef={imageRef}
                                         panel={panel}
                                         disableZoom={disableZoom}

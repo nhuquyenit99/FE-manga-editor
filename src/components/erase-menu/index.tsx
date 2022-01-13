@@ -11,8 +11,10 @@ export const EraseMenu = () => {
         onClearAll, onUndo, 
         setBrushWidth, setColor 
     } = useContext(EraserContext);
+    console.log('🚀 ~ file: index.tsx ~ line 14 ~ EraseMenu ~ onUndo', onUndo);
 
     const onUndoViaKeyDown = (e: KeyboardEvent) => {
+        console.log('🚀 ~ file: index.tsx ~ line 17 ~ onUndoViaKeyDown ~ e.ctrlKey && e.key === \'z\'', e.ctrlKey && e.key === 'z');
         if (e.ctrlKey && e.key === 'z') {
             onUndo();
         }
