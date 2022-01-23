@@ -133,9 +133,15 @@
 
                 .react-transform-wrapper {
                     background-color: #e6f7ff26;
-                    .react-transform-component.erase-mode {
-                        cursor: none;
+                    .react-transform-component{
+                        &.erase-mode {
+                            cursor: none;
+                        }                   
+                        &.panable {
+                            cursor: grabbing;
+                        }
                     }
+
                 }
 
                 .image-panel-wrapper {

@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import moment from 'moment';
 import CanvasDraw from 'react-canvas-draw';
 import { Button, Dropdown, Menu, Tooltip } from 'antd';
-import { DownOutlined, ExportOutlined, SaveOutlined, TranslationOutlined } from '@ant-design/icons';
+import { DownOutlined, ExportOutlined, TranslationOutlined } from '@ant-design/icons';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { 
@@ -11,13 +11,13 @@ import {
     ExportImageModal, EraseMenu, PDFViewer 
 } from '../../../components';
 import { EraserContext, ImageContext, TextBoxContext } from '../../../context';
-import { useImageSize } from '../../../utils';
+import { mergeClass, useImageSize } from '../../../utils';
 import { TextBoxData } from '../../../model';
 import { EditSideBar } from './side-bar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMousePointer, faSearch, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faHandRock, faMousePointer, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './style.scss';
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -29,15 +29,14 @@ export const EditPage = () => {
 
     const imageRef = useRef<any>();
     const saveModelRef = useRef<any>();
-    const zoomRef = useRef<any>();
+    const zoomRef = React.createRef<ReactZoomPanPinchRef>();
 
     const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
     const [activeTextBox, setActiveTextBox] = useState<string>('');
     const [brushWidth, setBrushWidth] = useState(10);
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
-    const [disableZoom, setDisableZoom] = useState(true);
+    const [panable, setPanable] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    // const [pdfCanvasDraw, setPdfCanvasDraw] = useState();
 
     let canvasDrawRef = null as any;
     let PDFViewerRef = React.createRef<any>();
@@ -124,19 +123,19 @@ export const EditPage = () => {
                         {currentImage && 
                         <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
                             <Menu.Item onClick={() => {
-                                canvasDrawRef?.resetView?.();
+                                zoomRef.current?.resetTransform();
                                 saveModelRef.current?.open();
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
-                            <Menu.Item onClick={() => {
-                                canvasDrawRef?.resetView?.();
+                            {/* <Menu.Item onClick={() => {
+                                zoomRef.current?.resetTransform();
                                 saveModelRef.current?.open();
                             }} icon={<SaveOutlined size={16}/>}>
                                 Save
-                            </Menu.Item>
+                            </Menu.Item> */}
                             <Menu.Item onClick={() => {
-                                // canvasDrawRef?.resetView?.();
+                                zoomRef.current?.resetTransform();
                                 history.push('/translate');
                             }} icon={<TranslationOutlined size={16}/>}>
                                 Auto-Translate
@@ -186,28 +185,23 @@ export const EditPage = () => {
                             <Panel />
                             <div className='workspace'>
                                 <div className='change-mode-tool'>
-                                    {panel === 'erase' && <>
-                                        <Tooltip title='Disable Zoom' placement='right'>
-                                            <button onClick={() => {
-                                                setDisableZoom(true);
-                                                canvasDrawRef?.resetView?.();
-                                            }}
-                                            className={disableZoom ? 'active' : ''}
-                                            ><FontAwesomeIcon icon={faMousePointer}/></button>
-                                        </Tooltip>
-                                        <Tooltip title='Zoom' placement='right'>
-                                            <button onClick={() => setDisableZoom(false)}
-                                                className={disableZoom ? '' : 'active'}
-                                            ><FontAwesomeIcon icon={faSearch}/></button>
-                                        </Tooltip>
-                                    </>}
+                                    <Tooltip title='Disable Dragging' placement='right'>
+                                        <button onClick={() => setPanable(false)}
+                                            className={!panable ? 'active' : ''}
+                                        ><FontAwesomeIcon icon={faMousePointer}/></button>
+                                    </Tooltip>
+                                    <Tooltip title='Drag Image' placement='right'>
+                                        <button onClick={() => setPanable(true)}
+                                            className={panable ? 'active': ''}
+                                        ><FontAwesomeIcon icon={faHandRock}/></button>
+                                    </Tooltip>
                                 </div>
                                 <TransformWrapper
                                     minScale={0.2}
                                     maxScale={2}
                                     centerZoomedOut
                                     panning={{
-                                        disabled: true
+                                        disabled: !panable
                                     }}
                                     ref={zoomRef}
                                 >
@@ -215,14 +209,16 @@ export const EditPage = () => {
                                         <div className='image-panel-wrapper'>
                                             <div className='image-wrapper'>
                                                 <TransformComponent 
-                                                    contentClass={panel === 'erase' ? 'erase-mode' : undefined}
+                                                    contentClass={mergeClass(panel === 'erase' ? 'erase-mode' : undefined, 
+                                                        panable ? 'panable': ''
+                                                    )}
                                                 >
                                                     {currentImage.type === 'application/pdf' 
                                                         ? <PDFViewer url={currentImage.url}
                                                             ref={PDFViewerRef}
                                                             imageRef={imageRef}
                                                             panel={panel}
-                                                            disableZoom={disableZoom}
+                                                            textBoxDraggable={!panable}
                                                         />
                                                         :<><div className='image-to-edit' ref={imageRef}>
                                                             <CanvasDraw imgSrc={currentImage.url ?? ''}
@@ -235,13 +231,12 @@ export const EditPage = () => {
                                                                 brushColor={brushColor}
                                                                 lazyRadius={1}
                                                                 brushRadius={brushWidth}
-                                                                //@ts-ignore
-                                                                enablePanAndZoom={!disableZoom}
                                                             />
                                                             {Object.values(textBoxs).map(textBox => (
                                                                 <TextBox 
                                                                     key={textBox.id}
                                                                     data={textBox}
+                                                                    draggable={!panable}
                                                                 />
                                                             ))}
                                                         </div>
@@ -257,43 +252,6 @@ export const EditPage = () => {
                                         </div>
                                     )}
                                 </TransformWrapper>
-                                {/* {currentImage.type === 'application/pdf' 
-                                    ? <PDFViewer url={currentImage.url}
-                                        ref={PDFViewerRef}
-                                        imageRef={imageRef}
-                                        panel={panel}
-                                        disableZoom={disableZoom}
-                                    />
-                                    :<><div className='image-to-edit' ref={imageRef}>
-                                        <CanvasDraw imgSrc={currentImage.url ?? ''}
-                                            canvasHeight={canvasHeight}
-                                            canvasWidth={canvasWidth}
-                                            hideGrid
-                                            ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                                            onChange={() => {}}
-                                            disabled={panel !== 'erase'}
-                                            brushColor={brushColor}
-                                            lazyRadius={1}
-                                            brushRadius={brushWidth}
-                                            //@ts-ignore
-                                            enablePanAndZoom={!disableZoom}
-                                        />
-                                        {Object.values(textBoxs).map(textBox => (
-                                            <TextBox 
-                                                key={textBox.id}
-                                                data={textBox}
-                                            />
-                                        ))}
-                                    </div>
-                                    {/* {panel === 'erase' && !disableZoom && <div className='tools'>
-                                        <button className='btn-reset-view' onClick={() => {
-                                            canvasDrawRef?.resetView?.();
-                                        }}>Reset View
-                                        </button>
-                                    </div> */}
-                                {/* } */}
-                                {/* </> */}
-                                {/* }  */}
                                 <ExportImageModal 
                                     onSave={onExport}
                                     ref={saveModelRef}

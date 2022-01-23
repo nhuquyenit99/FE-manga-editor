@@ -15,11 +15,11 @@ type PDFViewerProps = {
     url: string,
     imageRef: any
     panel: 'crop' | 'text' | 'draw' | 'erase';
-    disableZoom?: boolean
+    textBoxDraggable?: boolean
 }
 
 export const PDFViewer = forwardRef(({ 
-    url, imageRef, panel = 'text', disableZoom = true 
+    url, imageRef, panel = 'text', textBoxDraggable = true 
 }: PDFViewerProps, ref) =>  {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -115,7 +115,7 @@ export const PDFViewer = forwardRef(({
                         }}
                     />
                 </Document>
-                <><div className='image-to-edit' ref={imageRef}>
+                <div className='image-to-edit' ref={imageRef}>
                     <CanvasDraw imgSrc={canvasUrl}
                         canvasHeight={canvasHeight}
                         canvasWidth={canvasWidth}
@@ -126,25 +126,17 @@ export const PDFViewer = forwardRef(({
                         brushColor={brushColor}
                         lazyRadius={1}
                         brushRadius={brushWidth}
-                        //@ts-ignore
-                        enablePanAndZoom={!disableZoom}
                     />
                     {Object.values(textBoxs).filter(item => item.page === pageNumber)
                         .map(textBox => (
                             <TextBox 
                                 key={textBox.id}
                                 data={textBox}
+                                draggable={textBoxDraggable}
                             />
                         ))
                     }
                 </div>
-                {panel === 'erase' && !disableZoom && <div className='tools'>
-                    <button className='btn-reset-view' onClick={() => {
-                        canvasDrawRef?.resetView?.();
-                    }}>Reset View
-                    </button>
-                </div>
-                }</>
             </div>
         </div>
     );

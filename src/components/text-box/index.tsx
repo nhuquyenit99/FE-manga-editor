@@ -7,13 +7,15 @@ import './style.scss';
 
 type TextBoxProps = {
     data: TextBoxData
+    draggable?: boolean
 }
 
-export const TextBox = ({data}: TextBoxProps) => {
+export const TextBox = ({data, draggable = true}: TextBoxProps) => {
     const { setActiveId, removeTextBox } = useContext(TextBoxContext);
     return (
         <Rnd
             default={data.coordinates}
+            disableDragging={!draggable}
             bounds="parent"
             className='text-input draggable'
         >
