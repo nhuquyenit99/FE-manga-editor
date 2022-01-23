@@ -56,13 +56,14 @@
 
     .pdf-viewer-wrapper {
         display: flex;
+        flex-direction: column;
         column-gap: 15px;
         position: relative;
         min-height: calc(100vh - 100px);
 
-        // .document-pdf-viewer {
-        //     display: none;
-        // }
+        .document-pdf-viewer {
+            display: none;
+        }
 
         .react-pdf__message--no-data {
             display: none;

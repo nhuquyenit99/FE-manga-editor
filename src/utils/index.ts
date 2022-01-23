@@ -43,7 +43,7 @@ export function useImageSize(url: string) {
         setHeight(img.naturalHeight);
     };
     return {
-        canvasWidth: width,
-        canvasHeight: height
+        canvasWidth: width ?? 824,
+        canvasHeight: height ?? 1170
     };
 }

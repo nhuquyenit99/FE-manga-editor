@@ -29,12 +29,13 @@ export const PDFViewer = forwardRef(({
 
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState(1);
-    const [rehydrate, setRehydrate] = useState(false);
-    const [pageLoaded, setPageLoaded] = useState(false);
+    // const [rehydrate, setRehydrate] = useState(false);
+    const [pageLoaded, setPageLoaded] = useState<Record<number, boolean>>({});
 
     const pdfDataRef = useRef<PDFDocumentProxy>();
-    const canvasRef = useRef<HTMLCanvasElement|null>(null);
-    const [canvasUrl, setCanvasUrl] = useState<string>();
+    // const listcanvasRef = useRef<any>([]);
+    // const [listCanvasUrl, setListCanvasUrl] = useState<Record<number, string | undefined>>({});
+    const listCanvasUrlRef = useRef<any>([]);
 
     let canvasDrawRef = null as any;
 
@@ -43,38 +44,36 @@ export const PDFViewer = forwardRef(({
         clear: canvasDrawRef?.clear
     }));
 
-    const changePage = (offset: number) => {
-        setPageLoaded(false);
-        setCurrentPage(pageNumber + offset);
-        setPageNumber(prevPageNumber => prevPageNumber + offset);
-    };
+    // const changePage = (offset: number) => {
+    //     setPageLoaded(false);
+    //     setCurrentPage(pageNumber + offset);
+    //     setPageNumber(prevPageNumber => prevPageNumber + offset);
+    // };
 
-    const previousPage = () => {
-        changePage(-1);
-    };
+    // const previousPage = () => {
+    //     changePage(-1);
+    // };
 
-    const nextPage = () =>{
-        changePage(1);
-    };
+    // const nextPage = () =>{
+    //     changePage(1);
+    // };
 
     useEffect(() => {
-
+        listCanvasUrlRef.current = Array.from({length: 10}, (_, i) => i + 1)
+            .map((idx) => listCanvasUrlRef.current[idx] = React.createRef<HTMLCanvasElement | null>());
     }, [pageNumber]);
 
-    useEffect(() => {
-        if (rehydrate && pageLoaded) {
-            setCanvasUrl(canvasRef.current?.toDataURL());
-        }
-        pdfDataRef.current?.getPage(2).then((res) =>{
-            console.log('🚀 ~ file: index.tsx ~ line 65 ~ pdfDataRef.current?.getPage ~ res', res);
-        });
-    },[pageNumber, canvasRef, rehydrate, pageLoaded]);
+    // useEffect(() => {
+    //     if (rehydrate && pageLoaded) {
+    //         setCanvasUrl(canvasRef.current?.toDataURL());
+    //     }
+    // },[pageNumber, canvasRef, rehydrate, pageLoaded]);
 
-    const { canvasHeight, canvasWidth } = useImageSize(canvasUrl ?? '');
+    const { canvasHeight, canvasWidth } = useImageSize(listCanvasUrlRef.current?.[0] ?? '');
 
     return (
         <div className="pdf-viewer">
-            <div className='header-tool'>
+            {/* <div className='header-tool'>
                 <div className="buttonc">
                     <button
                         disabled={pageNumber <= 1}
@@ -91,16 +90,16 @@ export const PDFViewer = forwardRef(({
                         <FontAwesomeIcon icon={faCaretRight}/>
                     </button>
                 </div>
-            </div>
+            </div> */}
             <div className='pdf-viewer-wrapper'>
-                {(!pageLoaded || !rehydrate) && <LoadingFullView />}
+                {/* {(!pageLoaded || !rehydrate) && <LoadingFullView size='large' />} */}
                 <Document
                     file={currentImage?.url}
                     className='document-pdf-viewer'
                     onLoadSuccess={(pdf) => {
                         pdfDataRef.current = pdf;
                         setNumPages(pdf.numPages);
-                        setPageNumber(1);
+                        // setPageNumber(1);
                     }}
                     onLoadError={e => {
                         notification.error({
@@ -108,44 +107,70 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    {Array.from(Array(numPages).keys()).map(pageNum => (
-                        <Page pageNumber={pageNum} scale={1.5}
+                    {Array.from(Array(10).keys()).map(pageNum => {
+                        console.log('🚀 ~ file: index.tsx ~ line 110 ~ {Array.from ~ pageNum', pageNum);
+                        return <Page pageNumber={pageNum + 1} scale={1.5}
                             onRenderSuccess={() => {
-                                setPageLoaded(true);
+                                setPageLoaded(prev => {
+                                    return {
+                                        ...prev,
+                                        [pageNum]: true
+                                    };
+                                });
                             }}
                             onRenderError={e => {
-                                setPageLoaded(true);
-                                setRehydrate(true);
+                                setPageLoaded(prev => {
+                                    return {
+                                        ...prev,
+                                        [pageNum]: true
+                                    };
+                                });
+                                // setRehydrate(true);
                             }} 
                             canvasRef={canvas => {
-                                canvasRef.current = canvas;
-                                setRehydrate(true);
+                                let hydrate = false;
+                                const url = canvas?.toDataURL();
+                                // console.log('page', pageNum, '🚀 ~ file: index.tsx ~ line 121 ~ url', url);
+                                hydrate = true;
+                                if (hydrate) {
+                                    listCanvasUrlRef.current[pageNum] = url;
+                                }
+                                // canvasRef.current = canvas;
+                                // setRehydrate(true);
+                                // if (rehydrate) {
+                                    
+                                // }
+
                             }}
-                        />
-                    ))}
+                        />;
+                    })}
                 </Document>
-                {/* <div className='image-to-edit' ref={imageRef}>
-                    <CanvasDraw imgSrc={canvasUrl}
-                        canvasHeight={canvasHeight}
-                        canvasWidth={canvasWidth}
-                        hideGrid
-                        ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                        onChange={() => {}}
-                        disabled={panel !== 'erase'}
-                        brushColor={brushColor}
-                        lazyRadius={1}
-                        brushRadius={brushWidth}
-                    />
-                    {Object.values(textBoxs).filter(item => item.page === pageNumber)
-                        .map(textBox => (
-                            <TextBox 
-                                key={textBox.id}
-                                data={textBox}
-                                draggable={textBoxDraggable}
-                            />
-                        ))
-                    }
-                </div> */}
+                {Array.from(Array(10).keys()).map(page => (
+                    <div className='image-to-edit' ref={imageRef}>
+                        {!pageLoaded[page] && <LoadingFullView />}
+                        <CanvasDraw imgSrc={listCanvasUrlRef.current?.[page]}
+                            canvasHeight={canvasHeight}
+                            canvasWidth={canvasWidth}
+                            hideGrid
+                            ref={canvasDraw => (canvasDrawRef = canvasDraw)}
+                            onChange={() => {}}
+                            disabled={panel !== 'erase'}
+                            brushColor={brushColor}
+                            lazyRadius={1}
+                            brushRadius={brushWidth}
+                        />
+                        {Object.values(textBoxs).filter(item => item.page === page + 1)
+                            .map(textBox => (
+                                <TextBox 
+                                    key={textBox.id}
+                                    data={textBox}
+                                    draggable={textBoxDraggable}
+                                />
+                            ))
+                        }
+                    </div>
+                ))
+                }
             </div>
         </div>
     );
