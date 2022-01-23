@@ -15,8 +15,9 @@ import { useImageSize } from '../../../utils';
 import { TextBoxData } from '../../../model';
 import { EditSideBar } from './side-bar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMousePointer, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faMousePointer, faSearch, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import './style.scss';
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -28,6 +29,7 @@ export const EditPage = () => {
 
     const imageRef = useRef<any>();
     const saveModelRef = useRef<any>();
+    const zoomRef = useRef<any>();
 
     const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
     const [activeTextBox, setActiveTextBox] = useState<string>('');
@@ -200,28 +202,62 @@ export const EditPage = () => {
                                         </Tooltip>
                                     </>}
                                 </div>
-                                {/*<TransformWrapper
+                                <TransformWrapper
                                     minScale={0.2}
-                                    maxScale={3}
-                                    disabled={disableZoom}
+                                    maxScale={2}
+                                    centerZoomedOut
+                                    panning={{
+                                        disabled: true
+                                    }}
                                     ref={zoomRef}
                                 >
                                     {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
                                         <div className='image-panel-wrapper'>
                                             <div className='image-wrapper'>
-                                                <TransformComponent wrapperClass={disableZoom ? 'disabled-transform' : undefined}>
-                                                    
+                                                <TransformComponent 
+                                                    contentClass={panel === 'erase' ? 'erase-mode' : undefined}
+                                                >
+                                                    {currentImage.type === 'application/pdf' 
+                                                        ? <PDFViewer url={currentImage.url}
+                                                            ref={PDFViewerRef}
+                                                            imageRef={imageRef}
+                                                            panel={panel}
+                                                            disableZoom={disableZoom}
+                                                        />
+                                                        :<><div className='image-to-edit' ref={imageRef}>
+                                                            <CanvasDraw imgSrc={currentImage.url ?? ''}
+                                                                canvasHeight={canvasHeight}
+                                                                canvasWidth={canvasWidth}
+                                                                hideGrid
+                                                                ref={canvasDraw => (canvasDrawRef = canvasDraw)}
+                                                                onChange={() => {}}
+                                                                disabled={panel !== 'erase'}
+                                                                brushColor={brushColor}
+                                                                lazyRadius={1}
+                                                                brushRadius={brushWidth}
+                                                                //@ts-ignore
+                                                                enablePanAndZoom={!disableZoom}
+                                                            />
+                                                            {Object.values(textBoxs).map(textBox => (
+                                                                <TextBox 
+                                                                    key={textBox.id}
+                                                                    data={textBox}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        </>
+                                                    }
                                                 </TransformComponent>
                                             </div>
-                                            {!disableZoom && <div className="tools">
-                                                <button onClick={() => zoomIn()} title='Zoom In'><FontAwesomeIcon icon={faSearchPlus}/></button>
-                                                <button onClick={() => zoomOut()} title='Zoom Out'><FontAwesomeIcon icon={faSearchMinus}/></button>
+                                            {<div className="tools">
+                                                <button onClick={() => zoomIn(0.15)} title='Zoom In'><FontAwesomeIcon icon={faSearchPlus}/></button>
+                                                <button onClick={() => zoomOut(0.15)} title='Zoom Out'><FontAwesomeIcon icon={faSearchMinus}/></button>
                                                 <button onClick={() => resetTransform()} title='Reset'><FontAwesomeIcon icon={faTimes}/></button>
                                             </div>}
                                         </div>
                                     )}
-                                </TransformWrapper> */}
-                                {currentImage.type === 'application/pdf' 
+                                </TransformWrapper>
+                                {/* {currentImage.type === 'application/pdf' 
                                     ? <PDFViewer url={currentImage.url}
                                         ref={PDFViewerRef}
                                         imageRef={imageRef}
@@ -249,14 +285,15 @@ export const EditPage = () => {
                                             />
                                         ))}
                                     </div>
-                                    {panel === 'erase' && !disableZoom && <div className='tools'>
+                                    {/* {panel === 'erase' && !disableZoom && <div className='tools'>
                                         <button className='btn-reset-view' onClick={() => {
                                             canvasDrawRef?.resetView?.();
                                         }}>Reset View
                                         </button>
-                                    </div>
-                                    }</>
-                                }
+                                    </div> */}
+                                {/* } */}
+                                {/* </> */}
+                                {/* }  */}
                                 <ExportImageModal 
                                     onSave={onExport}
                                     ref={saveModelRef}

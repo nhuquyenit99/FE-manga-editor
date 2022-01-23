@@ -37,10 +37,6 @@ export const PDFViewer = forwardRef(({
     const [canvasUrl, setCanvasUrl] = useState<string>();
 
     let canvasDrawRef = null as any;
-    /*To Prevent right click on screen*/
-    // document.addEventListener('contextmenu', (event) => {
-    //     event.preventDefault();
-    // });
 
     useImperativeHandle(ref, () => ({
         undo: canvasDrawRef?.undo,
@@ -94,8 +90,6 @@ export const PDFViewer = forwardRef(({
                 <Document
                     file={currentImage?.url}
                     className='document-pdf-viewer'
-                    // loading={() => <LoadingFullView/>}
-                    // renderMode='svg'
                     onLoadSuccess={(pdf) => {
                         pdfDataRef.current = pdf;
                         setNumPages(pdf.numPages);
@@ -107,7 +101,7 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    <Page pageNumber={pageNumber} scale={1} 
+                    <Page pageNumber={pageNumber} scale={1.5}
                         onRenderSuccess={() => {
                             setPageLoaded(true);
                         }}
@@ -118,9 +112,8 @@ export const PDFViewer = forwardRef(({
                         canvasRef={canvas => {
                             canvasRef.current = canvas;
                             setRehydrate(true);
-                        }}/>
-                
-                    {/* {canvasUrl && <img src={canvasUrl} alt='img-editable'/>} */}
+                        }}
+                    />
                 </Document>
                 <><div className='image-to-edit' ref={imageRef}>
                     <CanvasDraw imgSrc={canvasUrl}

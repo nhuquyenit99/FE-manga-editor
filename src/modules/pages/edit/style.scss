@@ -118,7 +118,6 @@
                 overflow: auto;
                 height: calc(100vh - 61px);
 
-
                 .image-to-edit {
                     width: fit-content;
                     position: relative;
@@ -134,9 +133,8 @@
 
                 .react-transform-wrapper {
                     background-color: #e6f7ff26;
-
-                    &:not(.disabled-transform) {
-                        cursor: ne-resize;
+                    .react-transform-component.erase-mode {
+                        cursor: none;
                     }
                 }
 
@@ -183,8 +181,8 @@
                 }
 
                 .tools {
-                    right: 20px;
-                    top: 80px;
+                    right: 30px;
+                    top: 100px;
 
                     .btn-reset-view {
                         width: 100px;
