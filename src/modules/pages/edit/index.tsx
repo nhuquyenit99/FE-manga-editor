@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import moment from 'moment';
 import CanvasDraw from 'react-canvas-draw';
 import { Button, Dropdown, Menu, Tooltip } from 'antd';
-import { DownOutlined, ExportOutlined, TranslationOutlined } from '@ant-design/icons';
+import { DownOutlined, ExportOutlined, TranslationOutlined, SaveOutlined } from '@ant-design/icons';
 import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { 
@@ -128,12 +128,12 @@ export const EditPage = () => {
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
-                            {/* <Menu.Item onClick={() => {
+                            <Menu.Item onClick={() => {
                                 zoomRef.current?.resetTransform();
                                 saveModelRef.current?.open();
                             }} icon={<SaveOutlined size={16}/>}>
                                 Save
-                            </Menu.Item> */}
+                            </Menu.Item>
                             <Menu.Item onClick={() => {
                                 zoomRef.current?.resetTransform();
                                 history.push('/translate');

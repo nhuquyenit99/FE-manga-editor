@@ -58,9 +58,16 @@ export const PDFViewer = forwardRef(({
     };
 
     useEffect(() => {
+
+    }, [pageNumber]);
+
+    useEffect(() => {
         if (rehydrate && pageLoaded) {
             setCanvasUrl(canvasRef.current?.toDataURL());
         }
+        pdfDataRef.current?.getPage(2).then((res) =>{
+            console.log('🚀 ~ file: index.tsx ~ line 65 ~ pdfDataRef.current?.getPage ~ res', res);
+        });
     },[pageNumber, canvasRef, rehydrate, pageLoaded]);
 
     const { canvasHeight, canvasWidth } = useImageSize(canvasUrl ?? '');
@@ -101,21 +108,23 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    <Page pageNumber={pageNumber} scale={1.5}
-                        onRenderSuccess={() => {
-                            setPageLoaded(true);
-                        }}
-                        onRenderError={e => {
-                            setPageLoaded(true);
-                            setRehydrate(true);
-                        }} 
-                        canvasRef={canvas => {
-                            canvasRef.current = canvas;
-                            setRehydrate(true);
-                        }}
-                    />
+                    {Array.from(Array(numPages).keys()).map(pageNum => (
+                        <Page pageNumber={pageNum} scale={1.5}
+                            onRenderSuccess={() => {
+                                setPageLoaded(true);
+                            }}
+                            onRenderError={e => {
+                                setPageLoaded(true);
+                                setRehydrate(true);
+                            }} 
+                            canvasRef={canvas => {
+                                canvasRef.current = canvas;
+                                setRehydrate(true);
+                            }}
+                        />
+                    ))}
                 </Document>
-                <div className='image-to-edit' ref={imageRef}>
+                {/* <div className='image-to-edit' ref={imageRef}>
                     <CanvasDraw imgSrc={canvasUrl}
                         canvasHeight={canvasHeight}
                         canvasWidth={canvasWidth}
@@ -136,7 +145,7 @@ export const PDFViewer = forwardRef(({
                             />
                         ))
                     }
-                </div>
+                </div> */}
             </div>
         </div>
     );

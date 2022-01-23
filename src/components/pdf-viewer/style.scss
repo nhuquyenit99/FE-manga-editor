@@ -1,5 +1,5 @@
 .pdf-viewer {
-    position: relative;
+    // position: relative;
     min-height: calc(100vh -100px);
 
     .spin-loading {
@@ -60,7 +60,11 @@
         position: relative;
         min-height: calc(100vh - 100px);
 
-        .document-pdf-viewer {
+        // .document-pdf-viewer {
+        //     display: none;
+        // }
+
+        .react-pdf__message--no-data {
             display: none;
         }
 
