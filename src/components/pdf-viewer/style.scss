@@ -1,5 +1,5 @@
 .pdf-viewer {
-    // position: relative;
+    position: relative;
     min-height: calc(100vh -100px);
 
     .spin-loading {
@@ -49,6 +49,9 @@
                 &:hover {
                     background: linear-gradient(180deg, #00a3da, #09c);
                     opacity: 0.7;
+                }
+                &:disabled {
+                    cursor: not-allowed;
                 }
             }
         }

@@ -146,6 +146,7 @@
 
                 .image-panel-wrapper {
                     display: flex;
+                    position: relative;
 
                     .image-wrapper {
                         flex: 1;
@@ -187,8 +188,8 @@
                 }
 
                 .tools {
-                    right: 30px;
-                    top: 100px;
+                    right: 0;
+                    top: 0;
 
                     .btn-reset-view {
                         width: 100px;

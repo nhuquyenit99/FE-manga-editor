@@ -196,31 +196,31 @@ export const EditPage = () => {
                                         ><FontAwesomeIcon icon={faHandRock}/></button>
                                     </Tooltip>
                                 </div>
-                                <TransformWrapper
-                                    minScale={0.2}
-                                    maxScale={2}
-                                    centerZoomedOut
-                                    panning={{
-                                        disabled: !panable
-                                    }}
-                                    ref={zoomRef}
-                                >
-                                    {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
-                                        <div className='image-panel-wrapper'>
-                                            <div className='image-wrapper'>
-                                                <TransformComponent 
-                                                    contentClass={mergeClass(panel === 'erase' ? 'erase-mode' : undefined, 
-                                                        panable ? 'panable': ''
-                                                    )}
-                                                >
-                                                    {currentImage.type === 'application/pdf' 
-                                                        ? <PDFViewer url={currentImage.url}
-                                                            ref={PDFViewerRef}
-                                                            imageRef={imageRef}
-                                                            panel={panel}
-                                                            textBoxDraggable={!panable}
-                                                        />
-                                                        :<><div className='image-to-edit' ref={imageRef}>
+                                {currentImage.type === 'application/pdf' 
+                                    ? <PDFViewer url={currentImage.url}
+                                        ref={PDFViewerRef}
+                                        imageRef={imageRef}
+                                        panel={panel}
+                                        textBoxDraggable={!panable}
+                                    />
+                                    : <TransformWrapper
+                                        minScale={0.2}
+                                        maxScale={2}
+                                        centerZoomedOut
+                                        panning={{
+                                            disabled: !panable
+                                        }}
+                                        ref={zoomRef}
+                                    >
+                                        {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+                                            <div className='image-panel-wrapper'>
+                                                <div className='image-wrapper'>
+                                                    <TransformComponent 
+                                                        contentClass={mergeClass(panel === 'erase' ? 'erase-mode' : undefined, 
+                                                            panable ? 'panable': ''
+                                                        )}
+                                                    >
+                                                        <><div className='image-to-edit' ref={imageRef}>
                                                             <CanvasDraw imgSrc={currentImage.url ?? ''}
                                                                 canvasHeight={canvasHeight}
                                                                 canvasWidth={canvasWidth}
@@ -241,17 +241,17 @@ export const EditPage = () => {
                                                             ))}
                                                         </div>
                                                         </>
-                                                    }
-                                                </TransformComponent>
+                                                    </TransformComponent>
+                                                </div>
+                                                {<div className="tools">
+                                                    <button onClick={() => zoomIn(0.15)} title='Zoom In'><FontAwesomeIcon icon={faSearchPlus}/></button>
+                                                    <button onClick={() => zoomOut(0.15)} title='Zoom Out'><FontAwesomeIcon icon={faSearchMinus}/></button>
+                                                    <button onClick={() => resetTransform()} title='Reset'><FontAwesomeIcon icon={faTimes}/></button>
+                                                </div>}
                                             </div>
-                                            {<div className="tools">
-                                                <button onClick={() => zoomIn(0.15)} title='Zoom In'><FontAwesomeIcon icon={faSearchPlus}/></button>
-                                                <button onClick={() => zoomOut(0.15)} title='Zoom Out'><FontAwesomeIcon icon={faSearchMinus}/></button>
-                                                <button onClick={() => resetTransform()} title='Reset'><FontAwesomeIcon icon={faTimes}/></button>
-                                            </div>}
-                                        </div>
-                                    )}
-                                </TransformWrapper>
+                                        )}
+                                    </TransformWrapper>
+                                }
                                 <ExportImageModal 
                                     onSave={onExport}
                                     ref={saveModelRef}

@@ -1,15 +1,16 @@
-import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle, useCallback } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { notification } from 'antd';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft, faCaretRight, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { EraserContext, ImageContext, TextBoxContext } from '../../context';
 import { LoadingFullView } from '../loading';
-import { useImageSize } from '../../utils';
+import { mergeClass, useImageSize } from '../../utils';
 import { TextBox } from '../text-box';
 import './style.scss';
+import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 type PDFViewerProps = {
     url: string,
@@ -30,38 +31,48 @@ export const PDFViewer = forwardRef(({
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState(1);
     // const [rehydrate, setRehydrate] = useState(false);
-    const [pageLoaded, setPageLoaded] = useState<Record<number, boolean>>({});
+    const [pageLoaded, setPageLoaded] = useState(false);
+    const [currentUrl, setCurrentUrl] = useState<string>();
 
     const pdfDataRef = useRef<PDFDocumentProxy>();
     // const listcanvasRef = useRef<any>([]);
     // const [listCanvasUrl, setListCanvasUrl] = useState<Record<number, string | undefined>>({});
     const listCanvasUrlRef = useRef<any>([]);
+    const zoomRef = React.createRef<ReactZoomPanPinchRef>();
 
-    let canvasDrawRef = null as any;
+    let canvasDrawRef = useRef<any>(null);
 
     useImperativeHandle(ref, () => ({
-        undo: canvasDrawRef?.undo,
-        clear: canvasDrawRef?.clear
+        undo: canvasDrawRef.current?.undo,
+        clear: canvasDrawRef.current?.clear,
     }));
 
-    // const changePage = (offset: number) => {
-    //     setPageLoaded(false);
-    //     setCurrentPage(pageNumber + offset);
-    //     setPageNumber(prevPageNumber => prevPageNumber + offset);
-    // };
+    const changePage = (offset: number) => {
+        setPageLoaded(false);
+        zoomRef.current?.resetTransform();
+        setCurrentPage(pageNumber + offset);
+        const url = listCanvasUrlRef.current?.[pageNumber + offset];
+        if (url !== currentUrl) {
+            setCurrentUrl(url);
+        }
+        setPageNumber(prevPageNumber => prevPageNumber + offset);
+        setPageLoaded(true);
+    };
 
-    // const previousPage = () => {
-    //     changePage(-1);
-    // };
+    const previousPage = () => {
+        changePage(-1);
+    };
 
-    // const nextPage = () =>{
-    //     changePage(1);
-    // };
+    const nextPage = () =>{
+        changePage(1);
+    };
 
     useEffect(() => {
-        listCanvasUrlRef.current = Array.from({length: 10}, (_, i) => i + 1)
-            .map((idx) => listCanvasUrlRef.current[idx] = React.createRef<HTMLCanvasElement | null>());
-    }, [pageNumber]);
+        if (numPages) {
+            listCanvasUrlRef.current = Array.from({length: numPages}, (_, i) => i + 1)
+                .map((idx) => listCanvasUrlRef.current[idx] = React.createRef<HTMLCanvasElement | null>());
+        }
+    }, [numPages]);
 
     // useEffect(() => {
     //     if (rehydrate && pageLoaded) {
@@ -73,7 +84,7 @@ export const PDFViewer = forwardRef(({
 
     return (
         <div className="pdf-viewer">
-            {/* <div className='header-tool'>
+            <div className='header-tool'>
                 <div className="buttonc">
                     <button
                         disabled={pageNumber <= 1}
@@ -90,9 +101,8 @@ export const PDFViewer = forwardRef(({
                         <FontAwesomeIcon icon={faCaretRight}/>
                     </button>
                 </div>
-            </div> */}
+            </div>
             <div className='pdf-viewer-wrapper'>
-                {/* {(!pageLoaded || !rehydrate) && <LoadingFullView size='large' />} */}
                 <Document
                     file={currentImage?.url}
                     className='document-pdf-viewer'
@@ -107,70 +117,86 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    {Array.from(Array(10).keys()).map(pageNum => {
-                        console.log('🚀 ~ file: index.tsx ~ line 110 ~ {Array.from ~ pageNum', pageNum);
-                        return <Page pageNumber={pageNum + 1} scale={1.5}
+                    {Array.from({length: 10}, (_, i) => i + 1).map(pageNum => {
+                        return <Page pageNumber={pageNum} scale={1.5}
+                            key={pageNum}
                             onRenderSuccess={() => {
-                                setPageLoaded(prev => {
-                                    return {
-                                        ...prev,
-                                        [pageNum]: true
-                                    };
-                                });
+                                if (pageNum === pageNumber) {
+                                    setPageLoaded(true);
+                                }
                             }}
                             onRenderError={e => {
-                                setPageLoaded(prev => {
-                                    return {
-                                        ...prev,
-                                        [pageNum]: true
-                                    };
-                                });
+                                if (pageNum === pageNumber) {
+                                    setPageLoaded(true);
+                                }
                                 // setRehydrate(true);
                             }} 
                             canvasRef={canvas => {
                                 let hydrate = false;
                                 const url = canvas?.toDataURL();
-                                // console.log('page', pageNum, '🚀 ~ file: index.tsx ~ line 121 ~ url', url);
                                 hydrate = true;
                                 if (hydrate) {
                                     listCanvasUrlRef.current[pageNum] = url;
                                 }
-                                // canvasRef.current = canvas;
-                                // setRehydrate(true);
-                                // if (rehydrate) {
-                                    
-                                // }
-
+                                if (pageNum === pageNumber) {
+                                    setCurrentUrl(url);
+                                }
                             }}
                         />;
                     })}
                 </Document>
-                {Array.from(Array(10).keys()).map(page => (
-                    <div className='image-to-edit' ref={imageRef}>
-                        {!pageLoaded[page] && <LoadingFullView />}
-                        <CanvasDraw imgSrc={listCanvasUrlRef.current?.[page]}
-                            canvasHeight={canvasHeight}
-                            canvasWidth={canvasWidth}
-                            hideGrid
-                            ref={canvasDraw => (canvasDrawRef = canvasDraw)}
-                            onChange={() => {}}
-                            disabled={panel !== 'erase'}
-                            brushColor={brushColor}
-                            lazyRadius={1}
-                            brushRadius={brushWidth}
-                        />
-                        {Object.values(textBoxs).filter(item => item.page === page + 1)
-                            .map(textBox => (
-                                <TextBox 
-                                    key={textBox.id}
-                                    data={textBox}
-                                    draggable={textBoxDraggable}
-                                />
-                            ))
-                        }
-                    </div>
-                ))
-                }
+                <TransformWrapper
+                    minScale={0.2}
+                    maxScale={2}
+                    centerZoomedOut
+                    panning={{
+                        disabled: textBoxDraggable
+                    }}
+                    ref={zoomRef}
+                >
+                    {({ zoomIn, zoomOut, resetTransform,...rest }) => (
+                        <div className='image-panel-wrapper'>
+                            <div className='image-wrapper'>
+                                <TransformComponent 
+                                    contentClass={mergeClass(panel === 'erase' ? 'erase-mode' : undefined, 
+                                        !textBoxDraggable ? 'panable': ''
+                                    )}
+                                    key={currentUrl}
+                                >
+                                    <div className='image-to-edit' ref={imageRef}>
+                                        {!pageLoaded && <LoadingFullView />}
+                                        <CanvasDraw imgSrc={currentUrl}
+                                            key={`${currentUrl}-${pageNumber}`}
+                                            canvasHeight={canvasHeight}
+                                            canvasWidth={canvasWidth}
+                                            hideGrid
+                                            ref={canvasDraw => (canvasDrawRef.current = canvasDraw)}
+                                            onChange={() => {}}
+                                            disabled={panel !== 'erase'}
+                                            brushColor={brushColor}
+                                            // lazyRadius={1}
+                                            brushRadius={brushWidth}
+                                        />
+                                        {Object.values(textBoxs).filter(item => item.page === pageNumber)
+                                            .map(textBox => (
+                                                <TextBox 
+                                                    key={textBox.id}
+                                                    data={textBox}
+                                                    draggable={textBoxDraggable}
+                                                />
+                                            ))
+                                        }
+                                    </div>
+                                </TransformComponent>
+                            </div>
+                            {<div className="tools">
+                                <button onClick={() => zoomIn(0.15)} title='Zoom In'><FontAwesomeIcon icon={faSearchPlus}/></button>
+                                <button onClick={() => zoomOut(0.15)} title='Zoom Out'><FontAwesomeIcon icon={faSearchMinus}/></button>
+                                <button onClick={() => resetTransform()} title='Reset'><FontAwesomeIcon icon={faTimes}/></button>
+                            </div>}
+                        </div>
+                    )}
+                </TransformWrapper>
             </div>
         </div>
     );
