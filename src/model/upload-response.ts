@@ -1,4 +1,4 @@
-import { StringMappingType } from 'typescript';
+import { TextBoxData } from './text-box';
 
 export const defaultUploadResponse = {
     'asset_id': '7505885fe2b117f0c39485f611954493',
@@ -25,8 +25,11 @@ export const defaultUploadResponse = {
 export type UploadResponse = typeof defaultUploadResponse;
 
 export type FileData = {
+    id: string
     url: string
     original_filename: string
     created_at: string, 
-    type: string
+    type: string,
+    textBoxs: Record<string, TextBoxData>,
+    drawSaveData: string
 }

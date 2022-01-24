@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import uniqid from 'uniqid';
 import moment from 'moment';
 import { RcFile } from 'antd/lib/upload';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -6,19 +7,22 @@ import { Button, notification, Upload } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { LoadingFullView, SideBar } from '../../../components';
 import { DataAccess } from '../../../access';
-import { ImageContext } from '../../../context';
+import { ImageContext, TextBoxContext } from '../../../context';
 import { FileData } from '../../../model';
 import backgroundImage from '../../../assets/bg-img.png';
 import './style.scss';
 
 export function HomePage () {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-    const {setCurrentImage} = useContext(ImageContext);
+    const { setCurrentImage } = useContext(ImageContext);
+    const { setTextBoxs } = useContext(TextBoxContext);
     const history = useHistory();
 
     const [loading, setLoading] = useState(false);
 
-    const lastestProjects = JSON.parse(localStorage.getItem('uploadedList') ?? '[]').slice(0, 3) as FileData[];
+    const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '{}') as Record<string, FileData>;
+    const latestProjects = Object.values(listUploaded)?.slice(0, 3);
+
     return (
         <div className='home-page-layout'>
             <div className='header'>
@@ -38,17 +42,27 @@ export function HomePage () {
                                     formData.append('upload_preset', 'yj7nifwi');
                                     const res = await DataAccess.uploadImage(formData);
                                     if (res?.data) {
-                                        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
+                                        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
+                                        const id = uniqid();
                                         setCurrentImage({
+                                            id: id,
                                             url: res?.data?.secure_url,
-                                            type: (file as RcFile).type
-                                        });
-                                        localStorage.setItem('uploadedList', JSON.stringify([{
-                                            url: res?.data?.secure_url,
+                                            type: (file as RcFile).type,
                                             original_filename: res?.data?.original_filename,
                                             created_at: res?.data?.created_at,
-                                            type: (file as RcFile).type
-                                        }, ...uploadedList]));
+                                            drawSaveData: undefined
+                                        });
+                                        localStorage.setItem('uploadedList', JSON.stringify({
+                                            [id]: {
+                                                id: id,
+                                                url: res?.data?.secure_url,
+                                                original_filename: res?.data?.original_filename,
+                                                created_at: res?.data?.created_at,
+                                                type: (file as RcFile).type,
+                                                textBoxs: {},
+                                                drawSaveData: undefined
+                                            }, ...uploadedList
+                                        }));
                                         history.push('/edit/text');
                                     }
                                 } catch (e) {
@@ -69,17 +83,22 @@ export function HomePage () {
                             <Button type='primary' shape='round' loading={loading}>Open Image</Button>
                         </Upload.Dragger>
                     </div>
-                    {lastestProjects.length !== 0 && <div className='lastest-projects'>
+                    {latestProjects.length !== 0 && <div className='lastest-projects'>
                         <div className='title'>
                             Latest Projects
                         </div>
                         <div className='list-images'>
-                            {lastestProjects.map(item => (
+                            {latestProjects.map(item => (
                                 <div className='image-item' key={item.created_at} onClick={() => {
                                     setCurrentImage({
                                         url: item.url,
-                                        type: item.type
+                                        type: item.type,
+                                        created_at: item.created_at,
+                                        id: item.id,
+                                        original_filename: item.original_filename,
+                                        drawSaveData: item.drawSaveData
                                     });
+                                    setTextBoxs(item.textBoxs);
                                     history.push('/edit/text');
                                 }}>
                                     <div className='image-wrapper'>

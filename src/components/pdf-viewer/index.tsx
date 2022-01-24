@@ -37,9 +37,10 @@ export const PDFViewer = forwardRef(({
     const pdfDataRef = useRef<PDFDocumentProxy>();
     const currentCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const listCanvasUrlRef = useRef<any>([]);
+    const canvasDrawRef = useRef<CanvasDraw | null>(null);
     const zoomRef = React.createRef<ReactZoomPanPinchRef>();
-
-    let canvasDrawRef = useRef<any>(null);
+    
+    const { canvasHeight, canvasWidth } = useImageSize(listCanvasUrlRef.current?.[0] ?? '');
 
     useImperativeHandle(ref, () => ({
         undo: canvasDrawRef.current?.undo,
@@ -51,6 +52,7 @@ export const PDFViewer = forwardRef(({
         setCurrentPage(pageNumber + offset);
         setPageNumber(prevPageNumber => prevPageNumber + offset);
         zoomRef.current?.resetTransform();
+        const saveData = canvasDrawRef.current?.getSaveData();
     };
 
     const previousPage = () => {
@@ -60,6 +62,39 @@ export const PDFViewer = forwardRef(({
     const nextPage = () =>{
         changePage(1);
     };
+
+    const exportPDf = () => {
+
+    };
+
+    // const getPDFPageToExport = (page: number) => {
+    //     return (
+    //         <div className='image-to-edit' ref={imageRef}>
+    //             <CanvasDraw imgSrc={currentUrl}
+    //                 key={`${currentUrl}-${pageNumber}`}
+    //                 canvasHeight={canvasHeight}
+    //                 canvasWidth={canvasWidth}
+    //                 hideGrid
+    //                 ref={canvasDraw => (canvasDrawRef.current = canvasDraw)}
+    //                 onChange={() => {}}
+    //                 disabled={panel !== 'erase'}
+    //                 brushColor={brushColor}
+    //                 lazyRadius={1}
+    //                 brushRadius={brushWidth}
+    //                 hideInterface={panel !== 'erase'}
+    //             />
+    //             {Object.values(textBoxs).filter(item => item.page === pageNumber)
+    //                 .map(textBox => (
+    //                     <TextBox 
+    //                         key={textBox.id}
+    //                         data={textBox}
+    //                         draggable={textBoxDraggable}
+    //                     />
+    //                 ))
+    //             }
+    //         </div>
+    //     );
+    // };
 
     useEffect(() => {
         if (numPages) {
@@ -99,7 +134,6 @@ export const PDFViewer = forwardRef(({
         }
     },[pageNumber, currentCanvasRef, rehydrate, pageLoaded]);
 
-    const { canvasHeight, canvasWidth } = useImageSize(listCanvasUrlRef.current?.[0] ?? '');
 
     return (
         <div className="pdf-viewer">

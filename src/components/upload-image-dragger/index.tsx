@@ -6,6 +6,7 @@ import { DataAccess } from '../../access';
 import { ImageContext } from '../../context';
 import { useHistory } from 'react-router-dom';
 import { RcFile } from 'antd/lib/upload';
+import uniqid from 'uniqid';
 
 export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'}) => {
     const { setCurrentImage } = useContext(ImageContext);
@@ -21,17 +22,28 @@ export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'
                     formData.append('upload_preset', 'yj7nifwi');
                     const res = await DataAccess.uploadImage(formData);
                     if (res?.data) {
+                        const id = uniqid();
                         setCurrentImage({
-                            url: res?.data?.secure_url, 
-                            type: (file as RcFile).type
-                        });
-                        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
-                        localStorage.setItem('uploadedList', JSON.stringify([{
+                            id: id,
                             url: res?.data?.secure_url,
+                            type: (file as RcFile).type,
                             original_filename: res?.data?.original_filename,
                             created_at: res?.data?.created_at,
-                            type: (file as RcFile).type
-                        }, ...uploadedList]));
+                            drawSaveData: undefined
+                        });
+                        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
+                        localStorage.setItem('uploadedList', JSON.stringify({
+                            [id]: {
+                                id: id,
+                                url: res?.data?.secure_url,
+                                original_filename: res?.data?.original_filename,
+                                created_at: res?.data?.created_at,
+                                type: (file as RcFile).type,
+                                textBoxs: {},
+                                drawSaveData: undefined
+                            }, 
+                            ...uploadedList
+                        }));
                         if (type === 'edit') {
                             history.push('/edit/text');
                         } else {

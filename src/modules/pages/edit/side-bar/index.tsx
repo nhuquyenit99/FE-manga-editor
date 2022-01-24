@@ -7,8 +7,9 @@ import { faEraser, faHome, faFont, faImages } from '@fortawesome/free-solid-svg-
 import { ImageContext } from '../../../../context';
 import { mergeClass } from '../../../../utils';
 import { DataAccess } from '../../../../access';
-import './style.scss';
 import { RcFile } from 'antd/lib/upload';
+import uniqid from 'uniqid';
+import './style.scss';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -66,17 +67,20 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
                         formData.append('upload_preset', 'yj7nifwi');
                         const res = await DataAccess.uploadImage(formData);
                         if (res?.data) {
-                            setCurrentImage({
-                                url: res?.data?.secure_url, 
-                                type: (file as RcFile).type
-                            });
-                            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
-                            localStorage.setItem('uploadedList', JSON.stringify([{
-                                url: res?.data?.secure_url,
-                                original_filename: res?.data?.original_filename,
-                                created_at: res?.data?.created_at,
-                                type: (file as RcFile).type
-                            }, ...uploadedList]));
+
+                            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
+                            const id = uniqid();
+                            localStorage.setItem('uploadedList', JSON.stringify({
+                                [id]: {
+                                    id: id,
+                                    url: res?.data?.secure_url,
+                                    original_filename: res?.data?.original_filename,
+                                    created_at: res?.data?.created_at,
+                                    type: (file as RcFile).type,
+                                    textBoxs: {},
+                                    drawSaveData: undefined
+                                }, ...uploadedList
+                            }));
                         }
                     } catch (e) {
                         notification.error({

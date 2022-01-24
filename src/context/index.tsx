@@ -3,7 +3,11 @@ import { TextBoxData } from '../model';
 
 type ImageContextState = {
     url: string
-    type: string
+    type: string,
+    id: string,
+    original_filename: string,
+    created_at: string
+    drawSaveData?: string
 }
 
 export const ImageContext = React.createContext({

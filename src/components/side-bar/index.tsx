@@ -1,13 +1,15 @@
 import React, { useContext, useState } from 'react';
+import { RcFile } from 'antd/lib/upload';
 import { Link, useHistory } from 'react-router-dom';
-import { faGlobe, faHistory, faHome, faPenNib, faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, notification, Popover, Upload } from 'antd';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHistory, faHome, faPenNib, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { mergeClass } from '../../utils';
 import { ImageContext } from '../../context';
 import { DataAccess } from '../../access';
 import './style.scss';
-import { RcFile } from 'antd/lib/upload';
+import uniqid from 'uniqid';
+import Item from 'antd/lib/list/Item';
 
 export const SideBar = () => {
     const history = useHistory();
@@ -54,20 +56,30 @@ export const SideBar = () => {
                         formData.append('upload_preset', 'yj7nifwi');
                         const res = await DataAccess.uploadImage(formData);
                         if (res?.data) {
+                            const id = uniqid();
                             setCurrentImage({
-                                url: res?.data?.secure_url, 
-                                type: (file as RcFile).type
-                            });
-                            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
-                            localStorage.setItem('uploadedList', JSON.stringify([{
+                                id: id,
                                 url: res?.data?.secure_url,
+                                type: (file as RcFile).type,
                                 original_filename: res?.data?.original_filename,
                                 created_at: res?.data?.created_at,
-                                type: (file as RcFile).type
-                            }, ...uploadedList]));
+                                drawSaveData: undefined
+                            });
+                            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
+                            localStorage.setItem('uploadedList', JSON.stringify({
+                                [id]: {
+                                    id: id,
+                                    url: res?.data?.secure_url,
+                                    original_filename: res?.data?.original_filename,
+                                    created_at: res?.data?.created_at,
+                                    type: (file as RcFile).type,
+                                    textBoxs: {},
+                                    drawSaveData: undefined
+                                }, 
+                                ...uploadedList
+                            }));
                             history.push('/edit/text');
                         }
-
                     } catch (e) {
                         notification.error({
                             message: 'Upload Image Failed'

@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import moment from 'moment';
+import uniqid from 'uniqid';
 import CanvasDraw from 'react-canvas-draw';
 import { Button, Dropdown, Menu, Tooltip } from 'antd';
 import { DownOutlined, ExportOutlined, TranslationOutlined, SaveOutlined } from '@ant-design/icons';
@@ -16,8 +17,8 @@ import { TextBoxData } from '../../../model';
 import { EditSideBar } from './side-bar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandRock, faMousePointer, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
-import './style.scss';
 import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import './style.scss';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -67,13 +68,25 @@ export const EditPage = () => {
         link.download = `${fileName}${extension}`;
         link.href = dataUrl;
         link.click();
-        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '[]');
-        localStorage.setItem('uploadedList', JSON.stringify([{
-            url: dataUrl,
-            original_filename: fileName,
-            created_at: moment().toISOString()
-        }, ...uploadedList]));
+        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
+        const id = uniqid();
+        localStorage.setItem('uploadedList', JSON.stringify({
+            [id]: {
+                id: id,
+                url: dataUrl,
+                original_filename: fileName,
+                created_at: moment().toISOString(),
+                type: 'image',
+                textBoxs: {},
+                drawSaveData: undefined
+            }, 
+            ...uploadedList
+        }));
     },[imageRef]);
+
+    const onSaveData = () => {
+        
+    };
 
     const { canvasHeight, canvasWidth } = useImageSize(currentImage?.url ?? '');
 
@@ -109,7 +122,6 @@ export const EditPage = () => {
         );
     }
     const Panel = EditPanel[panel];
-    console.log('🚀 ~ file: index.tsx ~ line 123 ~ EditPage ~ canvasDrawRef', canvasDrawRef);
 
     return (
         <div className='edit-page-layout'>

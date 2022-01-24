@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import _ from 'lodash';
+import uniqid from 'uniqid';
 import { SketchPicker } from 'react-color';
 import { Button, Select, Popover, InputNumber } from 'antd';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,7 +16,7 @@ export const InsertTextPanel = () => {
     const { activeId, setActiveId, setTextBoxs, textBoxs, currentPage } = useContext(TextBoxContext);
 
     const onAddText = () => {
-        const id = _.uniqueId();
+        const id = uniqid();
         setTextBoxs(prev => {
             return {
                 ...prev,

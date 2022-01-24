@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useHistory } from 'react-router-dom';
 import { LoadingFullView, SideBar } from '../../../components';
-import { ImageContext } from '../../../context';
+import { ImageContext, TextBoxContext } from '../../../context';
 import { FileData } from '../../../model';
 import NoDataFoundPng from '../../../assets/nodata-found.png';
 import './style.scss';
@@ -12,9 +12,10 @@ import './style.scss';
 export function HistoryPage () {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     const { setCurrentImage } = useContext(ImageContext);
+    const { setTextBoxs } = useContext(TextBoxContext);
     const history = useHistory();
 
-    const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '[]') as FileData[];
+    const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '{}') as Record<string, FileData>;
 
     return (
         <div className='home-page-layout history-page-layout'>
@@ -26,12 +27,17 @@ export function HistoryPage () {
                 <div className='main-content'>
                     <h3 className='title'>All projects</h3>
                     <div className='list-uploaded'>
-                        {listUploaded.length > 0 ? listUploaded.map((item, idx) => (
+                        {Object.values(listUploaded).length > 0 ? Object.values(listUploaded).map((item, idx) => (
                             <div className='image-item' key={item.created_at} onClick={() => {
                                 setCurrentImage({
                                     url: item.url,
-                                    type: item.type
+                                    type: item.type,
+                                    id: item.id,
+                                    created_at: item.created_at,
+                                    drawSaveData: item.drawSaveData,
+                                    original_filename: item.original_filename
                                 });
+                                setTextBoxs(item.textBoxs);
                                 history.push('/edit/text');
                             }}>
                                 <div className='image-wrapper'>
