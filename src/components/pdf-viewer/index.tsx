@@ -117,7 +117,7 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    {Array.from({length: 10}, (_, i) => i + 1).map(pageNum => {
+                    {Array.from({length: numPages ?? 0}, (_, i) => i + 1).map(pageNum => {
                         return <Page pageNumber={pageNum} scale={1.5}
                             key={pageNum}
                             onRenderSuccess={() => {
