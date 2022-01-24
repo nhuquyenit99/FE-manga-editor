@@ -1,16 +1,16 @@
-import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { notification } from 'antd';
 import { PDFDocumentProxy } from 'pdfjs-dist';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faCaretRight, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { EraserContext, ImageContext, TextBoxContext } from '../../context';
 import { LoadingFullView } from '../loading';
 import { mergeClass, useImageSize } from '../../utils';
 import { TextBox } from '../text-box';
 import './style.scss';
-import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 
 type PDFViewerProps = {
     url: string,
@@ -30,13 +30,12 @@ export const PDFViewer = forwardRef(({
 
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState(1);
-    // const [rehydrate, setRehydrate] = useState(false);
+    const [rehydrate, setRehydrate] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
     const [currentUrl, setCurrentUrl] = useState<string>();
 
     const pdfDataRef = useRef<PDFDocumentProxy>();
-    // const listcanvasRef = useRef<any>([]);
-    // const [listCanvasUrl, setListCanvasUrl] = useState<Record<number, string | undefined>>({});
+    const currentCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const listCanvasUrlRef = useRef<any>([]);
     const zoomRef = React.createRef<ReactZoomPanPinchRef>();
 
@@ -49,14 +48,9 @@ export const PDFViewer = forwardRef(({
 
     const changePage = (offset: number) => {
         setPageLoaded(false);
-        zoomRef.current?.resetTransform();
         setCurrentPage(pageNumber + offset);
-        const url = listCanvasUrlRef.current?.[pageNumber + offset];
-        if (url !== currentUrl) {
-            setCurrentUrl(url);
-        }
         setPageNumber(prevPageNumber => prevPageNumber + offset);
-        setPageLoaded(true);
+        zoomRef.current?.resetTransform();
     };
 
     const previousPage = () => {
@@ -71,14 +65,39 @@ export const PDFViewer = forwardRef(({
         if (numPages) {
             listCanvasUrlRef.current = Array.from({length: numPages}, (_, i) => i + 1)
                 .map((idx) => listCanvasUrlRef.current[idx] = React.createRef<HTMLCanvasElement | null>());
+
+            // get all pages and convert them into image urls
+            (async() => {
+                await Promise.all(Array.from({length: numPages}, (_, i) => i + 1).map(async(page) => {
+                    return pdfDataRef.current?.getPage(page).then(async (res) => {
+                        const viewport = res.getViewport({
+                            scale: 1.5
+                        });
+                        let canvas = document.createElement('canvas');
+                        canvas.style.display = 'block';
+                        const context = canvas.getContext('2d');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+
+                        //draw on the canvas
+                        res.render({
+                            canvasContext: context ?? {}, 
+                            viewport: viewport
+                        }).promise.then(() => {
+                            const url = canvas.toDataURL();
+                            listCanvasUrlRef.current[page] = url;
+                        });
+                    });
+                }));
+            })();
         }
     }, [numPages]);
 
-    // useEffect(() => {
-    //     if (rehydrate && pageLoaded) {
-    //         setCanvasUrl(canvasRef.current?.toDataURL());
-    //     }
-    // },[pageNumber, canvasRef, rehydrate, pageLoaded]);
+    useEffect(() => {
+        if (rehydrate && pageLoaded) {
+            setCurrentUrl(currentCanvasRef.current?.toDataURL());
+        }
+    },[pageNumber, currentCanvasRef, rehydrate, pageLoaded]);
 
     const { canvasHeight, canvasWidth } = useImageSize(listCanvasUrlRef.current?.[0] ?? '');
 
@@ -117,33 +136,19 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    {Array.from({length: numPages ?? 0}, (_, i) => i + 1).map(pageNum => {
-                        return <Page pageNumber={pageNum} scale={1.5}
-                            key={pageNum}
-                            onRenderSuccess={() => {
-                                if (pageNum === pageNumber) {
-                                    setPageLoaded(true);
-                                }
-                            }}
-                            onRenderError={e => {
-                                if (pageNum === pageNumber) {
-                                    setPageLoaded(true);
-                                }
-                                // setRehydrate(true);
-                            }} 
-                            canvasRef={canvas => {
-                                let hydrate = false;
-                                const url = canvas?.toDataURL();
-                                hydrate = true;
-                                if (hydrate) {
-                                    listCanvasUrlRef.current[pageNum] = url;
-                                }
-                                if (pageNum === pageNumber) {
-                                    setCurrentUrl(url);
-                                }
-                            }}
-                        />;
-                    })}
+                    <Page pageNumber={pageNumber} scale={1.5}
+                        onRenderSuccess={() => {
+                            setPageLoaded(true);
+                        }}
+                        onRenderError={e => {
+                            setPageLoaded(true);
+                            setRehydrate(true);
+                        }} 
+                        canvasRef={canvas => {
+                            currentCanvasRef.current = canvas;
+                            setRehydrate(true);
+                        }}
+                    />
                 </Document>
                 <TransformWrapper
                     minScale={0.2}
@@ -174,8 +179,9 @@ export const PDFViewer = forwardRef(({
                                             onChange={() => {}}
                                             disabled={panel !== 'erase'}
                                             brushColor={brushColor}
-                                            // lazyRadius={1}
+                                            lazyRadius={1}
                                             brushRadius={brushWidth}
+                                            hideInterface={panel !== 'erase'}
                                         />
                                         {Object.values(textBoxs).filter(item => item.page === pageNumber)
                                             .map(textBox => (
