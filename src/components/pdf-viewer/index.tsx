@@ -28,7 +28,6 @@ export const PDFViewer = forwardRef(({
         setCurrentPage, drawSaveData, 
         currentPage, setDrawSaveData 
     } = useContext(ImageContext);
-    console.log('🚀 ~ file: index.tsx ~ line 31 ~ drawSaveData', drawSaveData);
     const { brushWidth, color: brushColor  } = useContext(EraserContext);
 
     const [numPages, setNumPages] = useState<number>();
@@ -47,13 +46,12 @@ export const PDFViewer = forwardRef(({
     useImperativeHandle(ref, () => ({
         undo: canvasDrawRef.current?.undo,
         clear: canvasDrawRef.current?.clear,
-        save: onSaveData
+        save: onSaveData 
     }));
 
     const changePage = (offset: number) => {
         setPageLoaded(false);
         const saveData = canvasDrawRef.current?.getSaveData();
-        console.log('🚀 ~ file: index.tsx ~ line 54 ~ changePage ~ saveData', saveData, typeof saveData);
         setDrawSaveData(prev => {
             return {
                 ...prev,
@@ -77,7 +75,6 @@ export const PDFViewer = forwardRef(({
         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
         const newdrawSaveData = canvasDrawRef.current?.getSaveData();
         if (currentImage) {
-            console.log('🚀 ~ file: index.tsx ~ line 95 ~ onSaveData ~ textBoxs', textBoxs);
             const newUploadedList = {
                 ...uploadedList,
                 [currentImage.id]: {

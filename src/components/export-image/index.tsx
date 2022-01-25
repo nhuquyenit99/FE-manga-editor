@@ -4,12 +4,12 @@ import { FormInstance } from 'antd/es/form';
 import { LoadingFullView } from '../loading';
 
 type ExportImageProps = {
-    onSave: (fileName: string, extension: '.jpg' | '.png' | '.svg') => Promise<void>
+    onSave: (fileName: string, extension: '.jpg' | '.png' | '.pdf') => Promise<void>
 }
 
 type FormSchema = {
     fileName: string
-    extension: '.jpg' | '.png' | '.svg'
+    extension: '.jpg' | '.png' | '.pdf'
 }
 
 export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => {
@@ -41,7 +41,7 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
     };
 
 
-    const onGenderChange = (value: '.jpg' | '.png' | '.svg') => {
+    const onGenderChange = (value: '.jpg' | '.png' | '.pdf') => {
         formRef.current!.setFieldsValue({ extension: value });
     };
 
@@ -66,7 +66,7 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
                     >
                         <Select.Option value=".jpg">.jpg</Select.Option>
                         <Select.Option value=".png">.png</Select.Option>
-                        <Select.Option value=".svg">.svg</Select.Option>
+                        <Select.Option value=".pdf">.pdf</Select.Option>
                     </Select>
                 </Form.Item>
             </Form>

@@ -1,10 +1,9 @@
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import moment from 'moment';
-import uniqid from 'uniqid';
 import CanvasDraw from 'react-canvas-draw';
+import { exportComponentAsPDF, exportComponentAsJPEG, exportComponentAsPNG } from 'react-component-export-image';
 import { Button, Dropdown, Menu, notification, Tooltip } from 'antd';
 import { DownOutlined, ExportOutlined, TranslationOutlined, SaveOutlined } from '@ant-design/icons';
-import { toJpeg, toPng, toSvg } from 'html-to-image';
+// import { toJpeg, toPng, toSvg } from 'html-to-image';
 import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { 
     CropperImagePanel, InsertTextPanel, 
@@ -42,37 +41,21 @@ export const EditPage = () => {
     const canvasDrawRef = useRef<CanvasDraw | null>(null);
     let PDFViewerRef = React.createRef<any>();
 
-    const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.svg') => {
-        let dataUrl;
+    const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.pdf') => {
         switch(extension) {
         case '.jpg': 
-            dataUrl = await toJpeg(imageRef.current, { cacheBust: true, });
+            exportComponentAsJPEG(imageRef);
             break;
         case '.png': 
-            dataUrl = await toPng(imageRef.current, { cacheBust: true, });
+            exportComponentAsPNG(imageRef);
             break;
-        case '.svg': 
-            dataUrl = await toSvg(imageRef.current, { cacheBust: true, });
+        case '.pdf': 
+            exportComponentAsPDF(imageRef);
             break;
         }
-        const link = document.createElement('a');
-        link.download = `${fileName}${extension}`;
-        link.href = dataUrl;
-        link.click();
-        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
-        const id = uniqid();
-        localStorage.setItem('uploadedList', JSON.stringify({
-            [id]: {
-                id: id,
-                url: dataUrl,
-                original_filename: fileName,
-                created_at: moment().toISOString(),
-                type: 'image',
-                textBoxs: {},
-                drawSaveData: undefined
-            }, 
-            ...uploadedList
-        }));
+
+        onSaveData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[imageRef]);
 
     const onSaveData = () => {
@@ -125,6 +108,7 @@ export const EditPage = () => {
                         <div className='title'>Edit Page</div>  
                         <div className='suffix'>
                             <Button shape='round' onClick={() => {
+                                onSaveData();
                                 setCurrentImage(undefined);
                                 history.push('/');
                             }} >Cancel</Button>
@@ -169,6 +153,7 @@ export const EditPage = () => {
                             <Button type='primary' shape='round' className='menu-action'>Menu <DownOutlined/></Button>
                         </Dropdown>}
                         <Button shape='round' onClick={() => {
+                            onSaveData();
                             setCurrentImage(undefined);
                             history.push('/');
                         }} >Cancel</Button>
