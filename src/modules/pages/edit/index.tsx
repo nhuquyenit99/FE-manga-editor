@@ -76,25 +76,32 @@ export const EditPage = () => {
     },[imageRef]);
 
     const onSaveData = () => {
+        if (currentImage?.type === 'application/pdf') {
+            PDFViewerRef.current?.save();
+            return;
+        }
         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
-        const drawSaveData = canvasDrawRef.current?.getSaveData();
+        const newdrawSaveData = canvasDrawRef.current?.getSaveData();
         if (currentImage) {
-            setDrawSaveData(prev => {
-                return {
-                    ...prev, 
-                    [currentPage]: drawSaveData ?? ''
-                };
-            });
             console.log('🚀 ~ file: index.tsx ~ line 95 ~ onSaveData ~ textBoxs', textBoxs);
             const newUploadedList = {
                 ...uploadedList,
                 [currentImage.id]: {
                     ...uploadedList[currentImage.id],
-                    drawSaveData: drawSaveData,
+                    drawSaveData: {
+                        ...drawSaveData,
+                        [currentPage]: newdrawSaveData
+                    },
                     textBoxs: textBoxs
                 }
             };
             localStorage.setItem('uploadedList', JSON.stringify(newUploadedList));
+            setDrawSaveData(prev => {
+                return {
+                    ...prev, 
+                    [currentPage]: newdrawSaveData ?? ''
+                };
+            });
             notification.success({
                 message: 'Saved'
             });
@@ -238,7 +245,7 @@ export const EditPage = () => {
                                                             brushColor={brushColor}
                                                             lazyRadius={1}
                                                             brushRadius={brushWidth}
-                                                            saveData={drawSaveData?.[currentPage]}
+                                                            saveData={drawSaveData?.[currentPage] ?? undefined}
                                                         />
                                                         {Object.values(textBoxs).map(textBox => (
                                                             <TextBox 

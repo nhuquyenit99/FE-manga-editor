@@ -24,11 +24,14 @@ export const PDFViewer = forwardRef(({
 }: PDFViewerProps, ref) =>  {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-    const { currentImage, textBoxs, setCurrentPage, drawSaveData, currentPage, setDrawSaveData } = useContext(ImageContext);
+    const { currentImage, textBoxs, 
+        setCurrentPage, drawSaveData, 
+        currentPage, setDrawSaveData 
+    } = useContext(ImageContext);
+    console.log('🚀 ~ file: index.tsx ~ line 31 ~ drawSaveData', drawSaveData);
     const { brushWidth, color: brushColor  } = useContext(EraserContext);
 
     const [numPages, setNumPages] = useState<number>();
-    const [pageNumber, setPageNumber] = useState(1);
     const [rehydrate, setRehydrate] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
     const [currentUrl, setCurrentUrl] = useState<string>();
@@ -44,19 +47,20 @@ export const PDFViewer = forwardRef(({
     useImperativeHandle(ref, () => ({
         undo: canvasDrawRef.current?.undo,
         clear: canvasDrawRef.current?.clear,
+        save: onSaveData
     }));
 
     const changePage = (offset: number) => {
         setPageLoaded(false);
         const saveData = canvasDrawRef.current?.getSaveData();
+        console.log('🚀 ~ file: index.tsx ~ line 54 ~ changePage ~ saveData', saveData, typeof saveData);
         setDrawSaveData(prev => {
             return {
                 ...prev,
                 [currentPage]: saveData ?? ''
             };
         });
-        setCurrentPage(pageNumber + offset);
-        setPageNumber(prevPageNumber => prevPageNumber + offset);
+        setCurrentPage(prev => prev + offset);
         zoomRef.current?.resetTransform();
         
     };
@@ -69,38 +73,66 @@ export const PDFViewer = forwardRef(({
         changePage(1);
     };
 
+    const onSaveData = () => {
+        const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
+        const newdrawSaveData = canvasDrawRef.current?.getSaveData();
+        if (currentImage) {
+            console.log('🚀 ~ file: index.tsx ~ line 95 ~ onSaveData ~ textBoxs', textBoxs);
+            const newUploadedList = {
+                ...uploadedList,
+                [currentImage.id]: {
+                    ...uploadedList[currentImage.id],
+                    drawSaveData: {
+                        ...drawSaveData,
+                        [currentPage]: newdrawSaveData
+                    },
+                    textBoxs: textBoxs
+                }
+            };
+            localStorage.setItem('uploadedList', JSON.stringify(newUploadedList));
+            setDrawSaveData(prev => {
+                return {
+                    ...prev, 
+                    [currentPage]: newdrawSaveData ?? ''
+                };
+            });
+            notification.success({
+                message: 'Saved'
+            });
+        }
+    };
+
     const exportPDf = () => {
 
     };
 
-    // const getPDFPageToExport = (page: number) => {
-    //     return (
-    //         <div className='image-to-edit' ref={imageRef}>
-    //             <CanvasDraw imgSrc={currentUrl}
-    //                 key={`${currentUrl}-${pageNumber}`}
-    //                 canvasHeight={canvasHeight}
-    //                 canvasWidth={canvasWidth}
-    //                 hideGrid
-    //                 ref={canvasDraw => (canvasDrawRef.current = canvasDraw)}
-    //                 onChange={() => {}}
-    //                 disabled={panel !== 'erase'}
-    //                 brushColor={brushColor}
-    //                 lazyRadius={1}
-    //                 brushRadius={brushWidth}
-    //                 hideInterface={panel !== 'erase'}
-    //             />
-    //             {Object.values(textBoxs).filter(item => item.page === pageNumber)
-    //                 .map(textBox => (
-    //                     <TextBox 
-    //                         key={textBox.id}
-    //                         data={textBox}
-    //                         draggable={textBoxDraggable}
-    //                     />
-    //                 ))
-    //             }
-    //         </div>
-    //     );
-    // };
+    const getPDFPageToExport = (page: number) => {
+        return (
+            <div className='image-to-edit' ref={imageRef}>
+                <CanvasDraw imgSrc={currentUrl}
+                    canvasHeight={canvasHeight}
+                    canvasWidth={canvasWidth}
+                    hideGrid
+                    ref={canvasDraw => (canvasDrawRef.current = canvasDraw)}
+                    onChange={() => {}}
+                    disabled={panel !== 'erase'}
+                    brushColor={brushColor}
+                    lazyRadius={1}
+                    brushRadius={brushWidth}
+                    hideInterface={panel !== 'erase'}
+                />
+                {Object.values(textBoxs).filter(item => item.page === page)
+                    .map(textBox => (
+                        <TextBox 
+                            key={textBox.id}
+                            data={textBox}
+                            draggable={textBoxDraggable}
+                        />
+                    ))
+                }
+            </div>
+        );
+    };
 
     useEffect(() => {
         if (numPages) {
@@ -138,7 +170,7 @@ export const PDFViewer = forwardRef(({
         if (rehydrate && pageLoaded) {
             setCurrentUrl(currentCanvasRef.current?.toDataURL());
         }
-    },[pageNumber, currentCanvasRef, rehydrate, pageLoaded]);
+    },[currentPage, currentCanvasRef, rehydrate, pageLoaded]);
 
 
     return (
@@ -146,15 +178,15 @@ export const PDFViewer = forwardRef(({
             <div className='header-tool'>
                 <div className="buttonc">
                     <button
-                        disabled={pageNumber <= 1}
+                        disabled={currentPage <= 1}
                         onClick={previousPage}
                         className="Pre"
                     >
                         <FontAwesomeIcon icon={faCaretLeft}/>
                     </button>
-                    <span>{`${pageNumber || (numPages ? 1 : '-')}/${numPages || '-'}`}</span>
+                    <span>{`${currentPage || (numPages ? 1 : '-')}/${numPages || '-'}`}</span>
                     <button
-                        disabled={pageNumber >= (numPages ?? 0)}
+                        disabled={currentPage >= (numPages ?? 0)}
                         onClick={nextPage}
                     >
                         <FontAwesomeIcon icon={faCaretRight}/>
@@ -176,7 +208,7 @@ export const PDFViewer = forwardRef(({
                         });
                     }}
                 >
-                    <Page pageNumber={pageNumber} scale={1.5}
+                    <Page pageNumber={currentPage} scale={1.5}
                         onRenderSuccess={() => {
                             setPageLoaded(true);
                         }}
@@ -211,7 +243,7 @@ export const PDFViewer = forwardRef(({
                                     <div className='image-to-edit' ref={imageRef}>
                                         {!pageLoaded && <LoadingFullView />}
                                         <CanvasDraw imgSrc={currentUrl}
-                                            key={`${currentUrl}-${pageNumber}`}
+                                            key={`${currentUrl}-${currentPage}`}
                                             canvasHeight={canvasHeight}
                                             canvasWidth={canvasWidth}
                                             hideGrid
@@ -222,9 +254,9 @@ export const PDFViewer = forwardRef(({
                                             lazyRadius={1}
                                             brushRadius={brushWidth}
                                             hideInterface={panel !== 'erase'}
-                                            saveData={drawSaveData?.[currentPage]}
+                                            saveData={drawSaveData?.[currentPage] ?? undefined}
                                         />
-                                        {Object.values(textBoxs).filter(item => item.page === pageNumber)
+                                        {Object.values(textBoxs).filter(item => item.page === currentPage)
                                             .map(textBox => (
                                                 <TextBox 
                                                     key={textBox.id}

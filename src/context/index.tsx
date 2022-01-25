@@ -17,7 +17,7 @@ export const ImageContext = React.createContext({
     removeTextBox: (id: string) => {},
     textBoxs: {} as Record<string, TextBoxData>,
     currentPage:  1,
-    setCurrentPage: (page: number) => {},
+    setCurrentPage: (() => {}) as React.Dispatch<React.SetStateAction<number>>,
     setTextBoxs: (() => {}) as React.Dispatch<React.SetStateAction<Record<string, TextBoxData>>>,
     drawSaveData: {} as Record<number, string>,
     setDrawSaveData: (() => {}) as React.Dispatch<React.SetStateAction<Record<number, string>>>,

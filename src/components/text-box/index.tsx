@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
-import { Rnd, DraggableData } from 'react-rnd';
+import { Rnd } from 'react-rnd';
 import { ImageContext } from '../../context';
 import { Cordinate, TextBoxData } from '../../model';
 import './style.scss';
