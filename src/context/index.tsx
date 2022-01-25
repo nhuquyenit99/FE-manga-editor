@@ -7,20 +7,40 @@ type ImageContextState = {
     id: string,
     original_filename: string,
     created_at: string
-    drawSaveData?: string
 }
 
 export const ImageContext = React.createContext({
     currentImage: undefined as ImageContextState|undefined,
-    setCurrentImage: (fileData?: ImageContextState) => {}
+    setCurrentImage: (fileData?: ImageContextState) => {},
+    activeId: '',
+    setActiveId: (id: string) => {},
+    removeTextBox: (id: string) => {},
+    textBoxs: {} as Record<string, TextBoxData>,
+    currentPage:  1,
+    setCurrentPage: (page: number) => {},
+    setTextBoxs: (() => {}) as React.Dispatch<React.SetStateAction<Record<string, TextBoxData>>>,
+    drawSaveData: {} as Record<number, string>,
+    setDrawSaveData: (() => {}) as React.Dispatch<React.SetStateAction<Record<number, string>>>,
 });
 
 export function ImageContextProvider ({children}: {children: React.ReactNode}) {
     const [currentImage, setCurrentImage] = useState<ImageContextState>();
 
+    const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
+    const [activeTextBox, setActiveTextBox] = useState<string>('');
+    const [drawSaveData, setDrawSaveData] = useState<Record<number, string>>({});
+    const [currentPage, setCurrentPage] = useState(1);
+
     useEffect(() => {
         const image = JSON.parse(localStorage.getItem('currentImage') ?? ' {}');
         setCurrentImage(image);
+        if (image) {
+            const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}'); 
+            const itemData = uploadedList?.[image.id];
+            setTextBoxs(itemData?.textBoxs ?? {});
+            setDrawSaveData(itemData?.drawSaveData ?? {});
+        }
+
     },[]);
 
     const updateCurrentImage = (fileData?: ImageContextState) => {
@@ -32,26 +52,33 @@ export function ImageContextProvider ({children}: {children: React.ReactNode}) {
         }
     };
 
+    const removeTextBox = (id: string) => {
+        let list = {...textBoxs};
+        delete list[id];
+        setTextBoxs(list);
+        if (activeTextBox === id) {
+            setActiveTextBox('');
+        }
+    };
+
     return (
         <ImageContext.Provider value={{
             currentImage: currentImage,
-            setCurrentImage: updateCurrentImage
+            setCurrentImage: updateCurrentImage,
+            activeId: activeTextBox,
+            setActiveId: setActiveTextBox,
+            removeTextBox: removeTextBox,
+            textBoxs: textBoxs,
+            currentPage: currentPage,
+            setTextBoxs: setTextBoxs,
+            setCurrentPage: setCurrentPage,
+            drawSaveData: drawSaveData,
+            setDrawSaveData: setDrawSaveData
         }}>
             {children}
         </ImageContext.Provider >
     );
 }
-
-export const TextBoxContext = React.createContext({
-    activeId: '',
-    setActiveId: (id: string) => {},
-    removeTextBox: (id: string) => {},
-    textBoxs: {} as Record<string, TextBoxData>,
-    currentPage:  1,
-    setCurrentPage: (page: number) => {},
-    setTextBoxs: (() => {}) as React.Dispatch<React.SetStateAction<Record<string, TextBoxData>>>
-});
-
 
 export const EraserContext = React.createContext({
     color: 'white',

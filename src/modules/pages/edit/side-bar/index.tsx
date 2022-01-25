@@ -19,7 +19,7 @@ type EditSidebarProps = {
 
 export const EditSideBar = ({action}: EditSidebarProps) => {
     const history = useHistory();
-    const { setCurrentImage, currentImage } = useContext(ImageContext);
+    const { setCurrentImage, currentImage, setTextBoxs, setDrawSaveData} = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
     return (
         <div className='edit-side-bar'>
@@ -70,6 +70,15 @@ export const EditSideBar = ({action}: EditSidebarProps) => {
 
                             const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
                             const id = uniqid();
+                            setCurrentImage({
+                                id: id,
+                                url: res?.data?.secure_url,
+                                original_filename: res?.data?.original_filename,
+                                created_at: res?.data?.created_at,
+                                type: (file as RcFile).type,
+                            });
+                            setTextBoxs({});
+                            setDrawSaveData({});
                             localStorage.setItem('uploadedList', JSON.stringify({
                                 [id]: {
                                     id: id,

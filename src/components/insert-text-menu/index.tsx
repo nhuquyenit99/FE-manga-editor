@@ -9,11 +9,11 @@ import {
 
 import { defaultCordinate, defaultTextBoxStyle, ListFontFamily } from '../../model';
 import { getColorStrFromRgba, getRgbaFromString, getSizeFromPixel } from '../../utils';
-import { TextBoxContext } from '../../context';
+import { ImageContext } from '../../context';
 import './style.scss';
 
 export const InsertTextPanel = () => {
-    const { activeId, setActiveId, setTextBoxs, textBoxs, currentPage } = useContext(TextBoxContext);
+    const { activeId, setActiveId, setTextBoxs, textBoxs, currentPage } = useContext(ImageContext);
 
     const onAddText = () => {
         const id = uniqid();

@@ -6,7 +6,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faCaretRight, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
-import { EraserContext, ImageContext, TextBoxContext } from '../../context';
+import { EraserContext, ImageContext } from '../../context';
 import { LoadingFullView } from '../loading';
 import { mergeClass, useImageSize } from '../../utils';
 import { TextBox } from '../text-box';
@@ -24,9 +24,8 @@ export const PDFViewer = forwardRef(({
 }: PDFViewerProps, ref) =>  {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-    const { currentImage } = useContext(ImageContext);
+    const { currentImage, textBoxs, setCurrentPage, drawSaveData, currentPage, setDrawSaveData } = useContext(ImageContext);
     const { brushWidth, color: brushColor  } = useContext(EraserContext);
-    const { textBoxs, setCurrentPage } = useContext(TextBoxContext);
 
     const [numPages, setNumPages] = useState<number>();
     const [pageNumber, setPageNumber] = useState(1);
@@ -49,10 +48,17 @@ export const PDFViewer = forwardRef(({
 
     const changePage = (offset: number) => {
         setPageLoaded(false);
+        const saveData = canvasDrawRef.current?.getSaveData();
+        setDrawSaveData(prev => {
+            return {
+                ...prev,
+                [currentPage]: saveData ?? ''
+            };
+        });
         setCurrentPage(pageNumber + offset);
         setPageNumber(prevPageNumber => prevPageNumber + offset);
         zoomRef.current?.resetTransform();
-        const saveData = canvasDrawRef.current?.getSaveData();
+        
     };
 
     const previousPage = () => {
@@ -216,6 +222,7 @@ export const PDFViewer = forwardRef(({
                                             lazyRadius={1}
                                             brushRadius={brushWidth}
                                             hideInterface={panel !== 'erase'}
+                                            saveData={drawSaveData?.[currentPage]}
                                         />
                                         {Object.values(textBoxs).filter(item => item.page === pageNumber)
                                             .map(textBox => (

@@ -7,15 +7,14 @@ import { Button, notification, Upload } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { LoadingFullView, SideBar } from '../../../components';
 import { DataAccess } from '../../../access';
-import { ImageContext, TextBoxContext } from '../../../context';
+import { ImageContext } from '../../../context';
 import { FileData } from '../../../model';
 import backgroundImage from '../../../assets/bg-img.png';
 import './style.scss';
 
 export function HomePage () {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-    const { setCurrentImage } = useContext(ImageContext);
-    const { setTextBoxs } = useContext(TextBoxContext);
+    const { setCurrentImage, setTextBoxs, setDrawSaveData } = useContext(ImageContext);
     const history = useHistory();
 
     const [loading, setLoading] = useState(false);
@@ -50,8 +49,9 @@ export function HomePage () {
                                             type: (file as RcFile).type,
                                             original_filename: res?.data?.original_filename,
                                             created_at: res?.data?.created_at,
-                                            drawSaveData: undefined
                                         });
+                                        setDrawSaveData({});
+                                        setTextBoxs({});
                                         localStorage.setItem('uploadedList', JSON.stringify({
                                             [id]: {
                                                 id: id,
@@ -60,7 +60,7 @@ export function HomePage () {
                                                 created_at: res?.data?.created_at,
                                                 type: (file as RcFile).type,
                                                 textBoxs: {},
-                                                drawSaveData: undefined
+                                                drawSaveData: {}
                                             }, ...uploadedList
                                         }));
                                         history.push('/edit/text');
@@ -96,8 +96,8 @@ export function HomePage () {
                                         created_at: item.created_at,
                                         id: item.id,
                                         original_filename: item.original_filename,
-                                        drawSaveData: item.drawSaveData
                                     });
+                                    setDrawSaveData(item.drawSaveData);
                                     setTextBoxs(item.textBoxs);
                                     history.push('/edit/text');
                                 }}>

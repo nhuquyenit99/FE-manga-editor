@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import uniqid from 'uniqid';
 import { RcFile } from 'antd/lib/upload';
 import { Link, useHistory } from 'react-router-dom';
 import { Button, notification, Popover, Upload } from 'antd';
@@ -8,14 +9,12 @@ import { mergeClass } from '../../utils';
 import { ImageContext } from '../../context';
 import { DataAccess } from '../../access';
 import './style.scss';
-import uniqid from 'uniqid';
-import Item from 'antd/lib/list/Item';
 
 export const SideBar = () => {
     const history = useHistory();
     const pathName = history.location.pathname;
 
-    const {setCurrentImage} = useContext(ImageContext);
+    const {setCurrentImage, setTextBoxs, setDrawSaveData} = useContext(ImageContext);
 
     const [loading, setLoading] = useState(false);
 
@@ -63,8 +62,9 @@ export const SideBar = () => {
                                 type: (file as RcFile).type,
                                 original_filename: res?.data?.original_filename,
                                 created_at: res?.data?.created_at,
-                                drawSaveData: undefined
                             });
+                            setTextBoxs({});
+                            setDrawSaveData({});
                             const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
                             localStorage.setItem('uploadedList', JSON.stringify({
                                 [id]: {
@@ -74,7 +74,7 @@ export const SideBar = () => {
                                     created_at: res?.data?.created_at,
                                     type: (file as RcFile).type,
                                     textBoxs: {},
-                                    drawSaveData: undefined
+                                    drawSaveData: {}
                                 }, 
                                 ...uploadedList
                             }));

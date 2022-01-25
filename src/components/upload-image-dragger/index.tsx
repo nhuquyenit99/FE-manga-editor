@@ -9,7 +9,7 @@ import { RcFile } from 'antd/lib/upload';
 import uniqid from 'uniqid';
 
 export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'}) => {
-    const { setCurrentImage } = useContext(ImageContext);
+    const { setCurrentImage, setTextBoxs, setDrawSaveData } = useContext(ImageContext);
     const [loading, setLoading] = useState(false);
     const history = useHistory();
     return (
@@ -29,8 +29,9 @@ export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'
                             type: (file as RcFile).type,
                             original_filename: res?.data?.original_filename,
                             created_at: res?.data?.created_at,
-                            drawSaveData: undefined
                         });
+                        setTextBoxs({});
+                        setDrawSaveData({});
                         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
                         localStorage.setItem('uploadedList', JSON.stringify({
                             [id]: {

@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useHistory } from 'react-router-dom';
 import { LoadingFullView, SideBar } from '../../../components';
-import { ImageContext, TextBoxContext } from '../../../context';
+import { ImageContext } from '../../../context';
 import { FileData } from '../../../model';
 import NoDataFoundPng from '../../../assets/nodata-found.png';
 import './style.scss';
@@ -11,8 +11,7 @@ import './style.scss';
 
 export function HistoryPage () {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-    const { setCurrentImage } = useContext(ImageContext);
-    const { setTextBoxs } = useContext(TextBoxContext);
+    const { setCurrentImage, setTextBoxs, setDrawSaveData} = useContext(ImageContext);
     const history = useHistory();
 
     const listUploaded = JSON.parse(localStorage.getItem('uploadedList') ?? '{}') as Record<string, FileData>;
@@ -34,9 +33,9 @@ export function HistoryPage () {
                                     type: item.type,
                                     id: item.id,
                                     created_at: item.created_at,
-                                    drawSaveData: item.drawSaveData,
                                     original_filename: item.original_filename
                                 });
+                                setDrawSaveData(item.drawSaveData);
                                 setTextBoxs(item.textBoxs);
                                 history.push('/edit/text');
                             }}>

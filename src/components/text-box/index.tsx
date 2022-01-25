@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Rnd } from 'react-rnd';
-import { TextBoxContext } from '../../context';
+import { ImageContext } from '../../context';
 import { TextBoxData } from '../../model';
 import './style.scss';
 
@@ -11,11 +11,13 @@ type TextBoxProps = {
 }
 
 export const TextBox = ({data, draggable = true}: TextBoxProps) => {
-    const { setActiveId, removeTextBox } = useContext(TextBoxContext);
+    const { setActiveId, removeTextBox } = useContext(ImageContext);
     return (
         <Rnd
             default={data.coordinates}
             disableDragging={!draggable}
+            onDrag={(e) => {
+            }}
             bounds="parent"
             className='text-input draggable'
         >

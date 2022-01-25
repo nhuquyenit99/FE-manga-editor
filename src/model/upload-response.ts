@@ -31,5 +31,5 @@ export type FileData = {
     created_at: string, 
     type: string,
     textBoxs: Record<string, TextBoxData>,
-    drawSaveData: string
+    drawSaveData: Record<number, string>
 }
