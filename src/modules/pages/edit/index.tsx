@@ -85,6 +85,7 @@ export const EditPage = () => {
                     [currentPage]: drawSaveData ?? ''
                 };
             });
+            console.log('🚀 ~ file: index.tsx ~ line 95 ~ onSaveData ~ textBoxs', textBoxs);
             const newUploadedList = {
                 ...uploadedList,
                 [currentImage.id]: {
@@ -142,16 +143,16 @@ export const EditPage = () => {
                     <div className='suffix'>
                         {currentImage && 
                         <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
-                            <Menu.Item onClick={() => {
+                            <Menu.Item key='export' onClick={() => {
                                 zoomRef.current?.resetTransform();
                                 saveModelRef.current?.open();
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
-                            <Menu.Item onClick={onSaveData} icon={<SaveOutlined size={16}/>}>
+                            <Menu.Item key='save' onClick={onSaveData} icon={<SaveOutlined size={16}/>}>
                                 Save
                             </Menu.Item>
-                            <Menu.Item onClick={() => {
+                            <Menu.Item key='trans' onClick={() => {
                                 zoomRef.current?.resetTransform();
                                 // history.push('/translate');
                             }} icon={<TranslationOutlined size={16}/>}>
