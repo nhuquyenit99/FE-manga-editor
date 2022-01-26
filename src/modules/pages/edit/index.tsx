@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { exportComponentAsPDF, exportComponentAsJPEG, exportComponentAsPNG } from 'react-component-export-image';
 import { Button, Dropdown, Menu, notification, Tooltip } from 'antd';
@@ -36,12 +36,22 @@ export const EditPage = () => {
     const [brushWidth, setBrushWidth] = useState(10);
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
     const [panable, setPanable] = useState(false);
+    const [hideDrawInterface, setHideDrawInterface] = useState(panel !== 'erase');
 
     // let canvasDrawRef = null as any;
     const canvasDrawRef = useRef<CanvasDraw | null>(null);
     let PDFViewerRef = React.createRef<any>();
 
+    useEffect(() => {
+        if (panel === 'erase') {
+            setHideDrawInterface(false);
+        } else {
+            setHideDrawInterface(true);
+        }
+    },[panel]);
+
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.pdf') => {
+        setHideDrawInterface(true);
         switch(extension) {
         case '.jpg': 
             exportComponentAsJPEG(imageRef);
@@ -53,7 +63,7 @@ export const EditPage = () => {
             exportComponentAsPDF(imageRef);
             break;
         }
-
+        setHideDrawInterface(panel !== 'erase');
         onSaveData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[imageRef]);
@@ -84,9 +94,6 @@ export const EditPage = () => {
                     ...prev, 
                     [currentPage]: newdrawSaveData ?? ''
                 };
-            });
-            notification.success({
-                message: 'Saved'
             });
         }
     };
@@ -136,7 +143,11 @@ export const EditPage = () => {
                         <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
                             <Menu.Item key='export' onClick={() => {
                                 zoomRef.current?.resetTransform();
-                                saveModelRef.current?.open();
+                                if (currentImage.type === 'application/pdf') {
+                                    PDFViewerRef.current?.exportPDF();
+                                } else {
+                                    saveModelRef.current?.open();
+                                }
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
@@ -229,6 +240,7 @@ export const EditPage = () => {
                                                             disabled={panel !== 'erase'}
                                                             brushColor={brushColor}
                                                             lazyRadius={1}
+                                                            hideInterface={hideDrawInterface}
                                                             brushRadius={brushWidth}
                                                             saveData={drawSaveData?.[currentPage] ?? undefined}
                                                         />

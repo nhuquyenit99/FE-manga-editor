@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
+import jsPDF from 'jspdf';
 import CanvasDraw from 'react-canvas-draw';
 import { notification } from 'antd';
 import { PDFDocumentProxy } from 'pdfjs-dist';
@@ -11,6 +12,7 @@ import { LoadingFullView } from '../loading';
 import { mergeClass, useImageSize } from '../../utils';
 import { TextBox } from '../text-box';
 import './style.scss';
+// import html2canvas from 'html2canvas';
 
 type PDFViewerProps = {
     url: string,
@@ -33,6 +35,7 @@ export const PDFViewer = forwardRef(({
     const [numPages, setNumPages] = useState<number>();
     const [rehydrate, setRehydrate] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
+    const [loadingAll, setLoadingAll] = useState(false);
     const [currentUrl, setCurrentUrl] = useState<string>();
 
     const pdfDataRef = useRef<PDFDocumentProxy>();
@@ -46,7 +49,8 @@ export const PDFViewer = forwardRef(({
     useImperativeHandle(ref, () => ({
         undo: canvasDrawRef.current?.undo,
         clear: canvasDrawRef.current?.clear,
-        save: onSaveData 
+        save: onSaveData,
+        exportPDF: exportPDF
     }));
 
     const changePage = (offset: number) => {
@@ -93,72 +97,79 @@ export const PDFViewer = forwardRef(({
                     [currentPage]: newdrawSaveData ?? ''
                 };
             });
-            notification.success({
-                message: 'Saved'
-            });
         }
     };
 
-    const exportPDf = () => {
-
+    const exportPDF = async () => {
+        try {
+            setLoadingAll(true);
+            onSaveData();
+            const listImageData = new Array<string>(10);
+            for(let i = 1; i <= (numPages ?? 1); i++) {
+                const imageData = listCanvasUrlRef.current[i];
+                listImageData[i] = imageData;
+            }
+            onExport(listImageData);
+            notification.success({
+                message: 'Exported Successfully'
+            });
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingAll(false);
+        }
+       
     };
 
-    const getPDFPageToExport = (page: number) => {
-        return (
-            <div className='image-to-edit' ref={imageRef}>
-                <CanvasDraw imgSrc={currentUrl}
-                    canvasHeight={canvasHeight}
-                    canvasWidth={canvasWidth}
-                    hideGrid
-                    ref={canvasDraw => (canvasDrawRef.current = canvasDraw)}
-                    onChange={() => {}}
-                    disabled={panel !== 'erase'}
-                    brushColor={brushColor}
-                    lazyRadius={1}
-                    brushRadius={brushWidth}
-                    hideInterface={panel !== 'erase'}
-                />
-                {Object.values(textBoxs).filter(item => item.page === page)
-                    .map(textBox => (
-                        <TextBox 
-                            key={textBox.id}
-                            data={textBox}
-                            draggable={textBoxDraggable}
-                        />
-                    ))
-                }
-            </div>
-        );
+    const onExport = (listImageData: string[]) => {
+        console.log('onExport');
+        const pdf = new jsPDF();
+        pdf.deletePage(1);
+        listImageData.forEach(imageData => {
+            pdf.addPage();
+            if (imageData) {
+                pdf.addImage(imageData, 'JPEG', 0, 0, 0, 0);
+
+            }
+        });
+        pdf.save('download.pdf');
     };
 
     useEffect(() => {
         if (numPages) {
             listCanvasUrlRef.current = Array.from({length: numPages}, (_, i) => i + 1)
                 .map((idx) => listCanvasUrlRef.current[idx] = React.createRef<HTMLCanvasElement | null>());
-
             // get all pages and convert them into image urls
             (async() => {
-                await Promise.all(Array.from({length: numPages}, (_, i) => i + 1).map(async(page) => {
-                    return pdfDataRef.current?.getPage(page).then(async (res) => {
-                        const viewport = res.getViewport({
-                            scale: 1.5
+                try {
+                    setLoadingAll(true);
+                    await Promise.all(Array.from({length: numPages}, (_, i) => i + 1).map(async(page) => {
+                        return pdfDataRef.current?.getPage(page).then(async (res) => {
+                            const viewport = res.getViewport({
+                                scale: 1.5
+                            });
+                            let canvas = document.createElement('canvas');
+                            canvas.style.display = 'block';
+                            const context = canvas.getContext('2d');
+                            canvas.width = viewport.width;
+                            canvas.height = viewport.height;
+    
+                            //draw on the canvas
+                            res.render({
+                                canvasContext: context ?? {}, 
+                                viewport: viewport
+                            }).promise.then(() => {
+                                const url = canvas.toDataURL();
+                                listCanvasUrlRef.current[page] = url;
+                            });
                         });
-                        let canvas = document.createElement('canvas');
-                        canvas.style.display = 'block';
-                        const context = canvas.getContext('2d');
-                        canvas.width = viewport.width;
-                        canvas.height = viewport.height;
-
-                        //draw on the canvas
-                        res.render({
-                            canvasContext: context ?? {}, 
-                            viewport: viewport
-                        }).promise.then(() => {
-                            const url = canvas.toDataURL();
-                            listCanvasUrlRef.current[page] = url;
-                        });
-                    });
-                }));
+                    }));
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    setLoadingAll(false);
+                }
+               
             })();
         }
     }, [numPages]);
@@ -238,7 +249,7 @@ export const PDFViewer = forwardRef(({
                                     key={currentUrl}
                                 >
                                     <div className='image-to-edit' ref={imageRef}>
-                                        {!pageLoaded && <LoadingFullView />}
+                                        {(!pageLoaded || loadingAll) && <LoadingFullView />}
                                         <CanvasDraw imgSrc={currentUrl}
                                             key={`${currentUrl}-${currentPage}`}
                                             canvasHeight={canvasHeight}
