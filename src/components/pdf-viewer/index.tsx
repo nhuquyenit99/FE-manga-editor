@@ -26,9 +26,10 @@ export const PDFViewer = forwardRef(({
 }: PDFViewerProps, ref) =>  {
     pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-    const { currentImage, textBoxs, 
+    const { 
+        currentImage, textBoxs, 
         setCurrentPage, drawSaveData, 
-        currentPage, setDrawSaveData 
+        currentPage, setDrawSaveData,
     } = useContext(ImageContext);
     const { brushWidth, color: brushColor  } = useContext(EraserContext);
 
@@ -133,6 +134,25 @@ export const PDFViewer = forwardRef(({
             }
         });
         pdf.save('download.pdf');
+    };
+
+    const getComponentToExport = (page: number) => {
+        const div = document.createElement('div');
+        div.className = 'image-to-edit';
+        const img = document.createElement('img');
+        img.src = listCanvasUrlRef.current[page];
+        div.append(img);
+        Object.values(textBoxs).filter(item => item.page === page).forEach(textData => {
+            const text = document.createElement('div');
+            text.className = 'text-input';
+            text.setAttribute('style', JSON.stringify({
+                left: textData.coordinates.x, 
+                top: textData.coordinates.y,
+                width: textData.coordinates.width,
+                height: textData.coordinates.height
+            }));
+            // text.innerHTML = textData.
+        });
     };
 
     useEffect(() => {

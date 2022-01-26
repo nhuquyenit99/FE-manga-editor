@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { Rnd } from 'react-rnd';
 import { ImageContext } from '../../context';
 import { Cordinate, TextBoxData } from '../../model';
 import './style.scss';
+import _ from 'lodash';
 
 type TextBoxProps = {
     data: TextBoxData
@@ -12,6 +13,7 @@ type TextBoxProps = {
 
 export const TextBox = ({data, draggable = true}: TextBoxProps) => {
     const { setActiveId, removeTextBox, setTextBoxs } = useContext(ImageContext);
+    const defaultValue = useRef(data.text);
 
     const onUpdateTextBox = (newData: Cordinate) => {
         setTextBoxs(prev => {
@@ -20,6 +22,20 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
                 [data.id]: {
                     ...data,
                     coordinates: newData
+                }
+            };
+        });
+    };
+
+    const onChangeText = (e: any) => {
+        const value =  e.currentTarget.innerHTML;
+        console.log('🚀 ~ file: index.tsx ~ line 32 ~ _.debounce ~ value', value);
+        setTextBoxs(prev => {
+            return {
+                ...prev,
+                [data.id]: {
+                    ...data,
+                    text: value
                 }
             };
         });
@@ -58,8 +74,10 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
                     sel.removeAllRanges();
                     sel.addRange(range);
                 }}
+                onInput={onChangeText} 
+                data-placeholder="Enter something..."
+                dangerouslySetInnerHTML={{__html: defaultValue.current}}
             >
-                Type something...
             </div>
             <CloseCircleOutlined className='btn-delete' onClick={() => removeTextBox(data.id)}/>
         </Rnd>

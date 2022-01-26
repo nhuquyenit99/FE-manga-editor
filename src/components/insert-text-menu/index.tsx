@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import uniqid from 'uniqid';
 import { SketchPicker } from 'react-color';
 import { Button, Select, Popover, InputNumber } from 'antd';
@@ -7,7 +7,7 @@ import {
     faBold, faItalic, faUnderline, faStrikethrough, faFont
 } from '@fortawesome/free-solid-svg-icons';
 
-import { defaultCordinate, defaultTextBoxStyle, ListFontFamily } from '../../model';
+import { Cordinate, defaultCordinate, defaultTextBoxStyle, ListFontFamily } from '../../model';
 import { getColorStrFromRgba, getRgbaFromString, getSizeFromPixel } from '../../utils';
 import { ImageContext } from '../../context';
 import './style.scss';
@@ -28,7 +28,8 @@ export const InsertTextPanel = () => {
                         y: defaultCordinate.y + Object.keys(textBoxs).length * 10,
                     },
                     style: {...defaultTextBoxStyle},
-                    page: currentPage
+                    page: currentPage,
+                    text: ''
                 }
             };
         });
