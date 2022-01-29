@@ -6,7 +6,7 @@
     border: 1px dashed transparent;
 
     .text-editable {
-        padding: 15px;
+        // padding: 15px;
         height: 100%;
         text-align: center;
         &:empty::before {
@@ -31,7 +31,7 @@
         position: absolute;
         font-size: 20px;
         right: 5px;
-        top: 5px;
+        bottom: 5px;
         cursor: pointer;
         color: red;
         display: none;

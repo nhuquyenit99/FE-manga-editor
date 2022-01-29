@@ -4,7 +4,7 @@ import { Rnd } from 'react-rnd';
 import { ImageContext } from '../../context';
 import { Cordinate, TextBoxData } from '../../model';
 import './style.scss';
-import _ from 'lodash';
+import { Popconfirm } from 'antd';
 
 type TextBoxProps = {
     data: TextBoxData
@@ -63,6 +63,7 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
             className='text-input draggable'
         >
             <div 
+                title={data.tooltip ? `Original: ${data.tooltip}` : ''}
                 style={data.style}
                 className='text-editable' 
                 contentEditable
@@ -79,7 +80,13 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
                 dangerouslySetInnerHTML={{__html: defaultValue.current}}
             >
             </div>
-            <CloseCircleOutlined className='btn-delete' onClick={() => removeTextBox(data.id)}/>
+            <Popconfirm title="Delete this textbox?" onConfirm={() => removeTextBox(data.id)}
+                okText='Yes'
+                cancelText='No'
+                placement='rightTop'
+            >
+                <CloseCircleOutlined className='btn-delete'/>
+            </Popconfirm>
         </Rnd>
     );
 };

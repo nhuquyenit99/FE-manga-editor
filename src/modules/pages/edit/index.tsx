@@ -8,7 +8,7 @@ import { Redirect, useHistory, useParams } from 'react-router-dom';
 import { 
     CropperImagePanel, InsertTextPanel, 
     UploadImageDragger, TextBox, 
-    ExportImageModal, EraseMenu, PDFViewer 
+    ExportImageModal, EraseMenu, PDFViewer, LoadingFullView 
 } from '../../../components';
 import { EraserContext, ImageContext } from '../../../context';
 import { mergeClass, useImageSize } from '../../../utils';
@@ -17,6 +17,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandRock, faMousePointer, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import './style.scss';
+import { DataAccess } from '../../../access';
+import { defaultTextBoxStyle, TextBoxData, TranslateResponse } from '../../../model';
+import { PDFViewerRef } from '../../../components/pdf-viewer';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -25,6 +28,7 @@ export const EditPage = () => {
         currentImage, setCurrentImage, 
         textBoxs, currentPage,
         drawSaveData, setDrawSaveData,
+        setTextBoxs
     } = useContext(ImageContext);
 
     let { panel } = useParams<{panel: EditAction}>();
@@ -37,10 +41,11 @@ export const EditPage = () => {
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
     const [panable, setPanable] = useState(false);
     const [hideDrawInterface, setHideDrawInterface] = useState(panel !== 'erase');
+    const [translating, setTranslating] = useState(false);
 
     // let canvasDrawRef = null as any;
     const canvasDrawRef = useRef<CanvasDraw | null>(null);
-    let PDFViewerRef = React.createRef<any>();
+    const PDFViewerRef = useRef<PDFViewerRef>();
 
     useEffect(() => {
         if (panel === 'erase') {
@@ -54,13 +59,23 @@ export const EditPage = () => {
         setHideDrawInterface(true);
         switch(extension) {
         case '.jpg': 
-            exportComponentAsJPEG(imageRef);
+            exportComponentAsJPEG(imageRef, {
+                fileName: fileName
+            });
             break;
         case '.png': 
-            exportComponentAsPNG(imageRef);
+            exportComponentAsPNG(imageRef, {
+                fileName: fileName
+            });
             break;
         case '.pdf': 
-            exportComponentAsPDF(imageRef);
+            exportComponentAsPDF(imageRef, {
+                fileName: fileName,
+                pdfOptions: {
+                    w: 210,
+                    h: 297,
+                }
+            });
             break;
         }
         setHideDrawInterface(panel !== 'erase');
@@ -100,6 +115,57 @@ export const EditPage = () => {
 
     const { canvasHeight, canvasWidth } = useImageSize(currentImage?.url ?? '');
 
+    const translate = async () => {
+        if (!currentImage) {
+            return ;
+        }
+        try {
+            setTranslating(true);
+            const res = await DataAccess.translate({
+                file_name: currentImage.original_filename,
+                url: currentImage.url,
+                page: currentPage
+            });
+            const listTextBoxs = res?.data as TranslateResponse;
+            if (listTextBoxs) {
+                const processedTextBoxs = {} as Record<string, TextBoxData>;
+                listTextBoxs.forEach(item => {
+                    processedTextBoxs[item.id] = {
+                        coordinates: {
+                            x: item.poly.x1 < item.poly.x2 ? item.poly.x1 : item.poly.x2,
+                            y: item.poly.y1 < item.poly.y2 ? item.poly.y1 : item.poly.y2,
+                            width: Math.abs(item.poly.x1 - item.poly.x2),
+                            height: Math.abs(item.poly.y1 - item.poly.y2)
+                        },
+                        id: item.id,
+                        page: item.page,
+                        style: {
+                            ...defaultTextBoxStyle,
+                            fontSize: '12px',
+                            borderRadius: '99px'
+                        },
+                        text: item.translated_text,
+                        tooltip: item.original_text
+                    };
+                });
+                setTextBoxs(processedTextBoxs);
+            }
+            console.log('🚀 ~ file: index.tsx ~ line 116 ~ translate ~ res', res);
+            notification.success({
+                message: 'Translate successfully'
+            });
+        } catch (e) {
+            notification.error({
+                message: 'Translate Failed',
+                description: 'Please try again'
+
+            });
+        } finally {
+            setTranslating(false);
+        }
+
+    };
+
     if (!panel) {
         return <Redirect to='/edit/text'/>;
     }
@@ -132,6 +198,7 @@ export const EditPage = () => {
 
     return (
         <div className='edit-page-layout'>
+            {translating && <LoadingFullView />}
             <EditSideBar 
                 action={panel}
             />
@@ -143,11 +210,7 @@ export const EditPage = () => {
                         <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
                             <Menu.Item key='export' onClick={() => {
                                 zoomRef.current?.resetTransform();
-                                if (currentImage.type === 'application/pdf') {
-                                    PDFViewerRef.current?.exportPDF();
-                                } else {
-                                    saveModelRef.current?.open();
-                                }
+                                saveModelRef.current?.open();
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
@@ -156,7 +219,7 @@ export const EditPage = () => {
                             </Menu.Item>
                             <Menu.Item key='trans' onClick={() => {
                                 zoomRef.current?.resetTransform();
-                                // history.push('/translate');
+                                translate();
                             }} icon={<TranslationOutlined size={16}/>}>
                                 Auto-Translate
                             </Menu.Item>
@@ -265,7 +328,13 @@ export const EditPage = () => {
                                 </TransformWrapper>
                             }
                             <ExportImageModal 
-                                onSave={onExport}
+                                onSave={async (fileName, extension) => {
+                                    if (currentImage.type === 'application/pdf') {
+                                        await PDFViewerRef.current?.export?.(fileName, extension);
+                                    } else {
+                                        await onExport(fileName, extension);
+                                    }
+                                }}
                                 ref={saveModelRef}
                             />
                         </div>

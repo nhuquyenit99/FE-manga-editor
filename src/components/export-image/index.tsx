@@ -1,7 +1,8 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, useRef, useContext } from 'react';
 import { Modal, Form, Input, Select, Button, notification } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import { LoadingFullView } from '../loading';
+import { ImageContext } from '../../context';
 
 type ExportImageProps = {
     onSave: (fileName: string, extension: '.jpg' | '.png' | '.pdf') => Promise<void>
@@ -16,6 +17,9 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const { currentImage, currentPage } = useContext(ImageContext);
+    console.log('🚀 ~ file: index.tsx ~ line 21 ~ ExportImageModal ~ currentPage', currentPage);
+    console.log('🚀 ~ file: index.tsx ~ line 21 ~ ExportImageModal ~ currentImage', currentImage);
     const formRef = useRef<FormInstance>(null);
 
     useImperativeHandle(ref, () => ({
@@ -55,17 +59,22 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
             </div>}
         >
             <Form className='export-form' ref={formRef} onFinish={onExport}>
-                <Form.Item name='fileName' rules={[{ required: true }]} label='File name'>
-                    <Input placeholder='File name'/>
+                <Form.Item name='fileName' rules={[{ required: true }]} label='File name'
+                    initialValue={
+                        `${currentImage?.original_filename ?? ''}${currentImage?.type === 'application/pdf' ? `_page${currentPage}` : ''}`
+                    }
+                >
+                    <Input placeholder='File name' />
                 </Form.Item>
-                <Form.Item name='extension' rules={[{ required: true }]} label='Extension' initialValue='.jpg'>
+                <Form.Item name='extension' rules={[{ required: true }]} label='Extension' 
+                    initialValue={currentImage?.type === 'application/pdf' ? '.pdf' : '.png'}>
                     <Select
                         placeholder="File Extension"
                         allowClear
                         onChange={onGenderChange}
                     >
-                        <Select.Option value=".jpg">.jpg</Select.Option>
-                        <Select.Option value=".png">.png</Select.Option>
+                        <Select.Option value=".png">.jpg</Select.Option>
+                        <Select.Option value=".jpg">.png</Select.Option>
                         <Select.Option value=".pdf">.pdf</Select.Option>
                     </Select>
                 </Form.Item>

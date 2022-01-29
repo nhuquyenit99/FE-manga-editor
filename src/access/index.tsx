@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 const CLOUD_NAME = 'doxgeaaoc';
+const BASE_API = 'http://192.168.1.5:8000';
 
 const IMAGEPost = async (data: any) => {
     return await axios({
@@ -14,6 +15,25 @@ const IMAGEPost = async (data: any) => {
     });
 };
 
+type ImageData = {
+    page: number,
+    url: string,
+    file_name: string
+}
+
+const APItranslate = async (data: ImageData) => {
+    return await axios({
+        method: 'POST',
+        url: `${BASE_API}/translate`,
+        data: data,
+        header: {
+            'Content-Type': 'application/json',
+            'Accept': '*/*',
+        },
+    });
+};
+
 export const DataAccess = {
-    uploadImage: IMAGEPost
+    uploadImage: IMAGEPost,
+    translate: APItranslate
 };

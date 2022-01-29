@@ -1,5 +1,4 @@
-import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
-import jsPDF from 'jspdf';
+import React, { useRef, useState, useEffect, useContext, forwardRef, useImperativeHandle, useCallback } from 'react';
 import CanvasDraw from 'react-canvas-draw';
 import { notification } from 'antd';
 import { PDFDocumentProxy } from 'pdfjs-dist';
@@ -11,14 +10,22 @@ import { EraserContext, ImageContext } from '../../context';
 import { LoadingFullView } from '../loading';
 import { mergeClass, useImageSize } from '../../utils';
 import { TextBox } from '../text-box';
-import './style.scss';
+import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
 // import html2canvas from 'html2canvas';
+import './style.scss';
 
 type PDFViewerProps = {
     url: string,
     imageRef: any
     panel: 'crop' | 'text' | 'draw' | 'erase';
     textBoxDraggable?: boolean
+}
+
+export type PDFViewerRef = {
+    undo: () => void,
+    clear: () => void,
+    save: () => void,
+    export: (fileName: string, extension: '.jpg' | '.png' | '.pdf') => Promise<void>
 }
 
 export const PDFViewer = forwardRef(({ 
@@ -44,6 +51,8 @@ export const PDFViewer = forwardRef(({
     const listCanvasUrlRef = useRef<any>([]);
     const canvasDrawRef = useRef<CanvasDraw | null>(null);
     const zoomRef = React.createRef<ReactZoomPanPinchRef>();
+    const [hideDrawInterface, setHideDrawInterface] = useState(panel !== 'erase');
+
     
     const { canvasHeight, canvasWidth } = useImageSize(listCanvasUrlRef.current?.[0] ?? '');
 
@@ -51,7 +60,7 @@ export const PDFViewer = forwardRef(({
         undo: canvasDrawRef.current?.undo,
         clear: canvasDrawRef.current?.clear,
         save: onSaveData,
-        exportPDF: exportPDF
+        export: onExport
     }));
 
     const changePage = (offset: number) => {
@@ -101,59 +110,41 @@ export const PDFViewer = forwardRef(({
         }
     };
 
-    const exportPDF = async () => {
-        try {
-            setLoadingAll(true);
-            onSaveData();
-            const listImageData = new Array<string>(10);
-            for(let i = 1; i <= (numPages ?? 1); i++) {
-                const imageData = listCanvasUrlRef.current[i];
-                listImageData[i] = imageData;
-            }
-            onExport(listImageData);
-            notification.success({
-                message: 'Exported Successfully'
+    const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.pdf') => {
+        setHideDrawInterface(true);
+        switch(extension) {
+        case '.jpg': 
+            exportComponentAsJPEG(imageRef, {
+                fileName: fileName
             });
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoadingAll(false);
+            break;
+        case '.png': 
+            exportComponentAsPNG(imageRef, {
+                fileName: fileName
+            });
+            break;
+        case '.pdf': 
+            exportComponentAsPDF(imageRef, {
+                fileName: fileName,
+                pdfOptions: {
+                    w: 210,
+                    h: 297,
+                }
+            });
+            break;
         }
-       
-    };
+        setHideDrawInterface(panel !== 'erase');
+        onSaveData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[imageRef]);
 
-    const onExport = (listImageData: string[]) => {
-        console.log('onExport');
-        const pdf = new jsPDF();
-        pdf.deletePage(1);
-        listImageData.forEach(imageData => {
-            pdf.addPage();
-            if (imageData) {
-                pdf.addImage(imageData, 'JPEG', 0, 0, 0, 0);
-
-            }
-        });
-        pdf.save('download.pdf');
-    };
-
-    const getComponentToExport = (page: number) => {
-        const div = document.createElement('div');
-        div.className = 'image-to-edit';
-        const img = document.createElement('img');
-        img.src = listCanvasUrlRef.current[page];
-        div.append(img);
-        Object.values(textBoxs).filter(item => item.page === page).forEach(textData => {
-            const text = document.createElement('div');
-            text.className = 'text-input';
-            text.setAttribute('style', JSON.stringify({
-                left: textData.coordinates.x, 
-                top: textData.coordinates.y,
-                width: textData.coordinates.width,
-                height: textData.coordinates.height
-            }));
-            // text.innerHTML = textData.
-        });
-    };
+    useEffect(() => {
+        if (panel === 'erase') {
+            setHideDrawInterface(false);
+        } else {
+            setHideDrawInterface(true);
+        }
+    },[panel]);
 
     useEffect(() => {
         if (numPages) {
@@ -281,7 +272,7 @@ export const PDFViewer = forwardRef(({
                                             brushColor={brushColor}
                                             lazyRadius={1}
                                             brushRadius={brushWidth}
-                                            hideInterface={panel !== 'erase'}
+                                            hideInterface={hideDrawInterface}
                                             saveData={drawSaveData?.[currentPage] ?? undefined}
                                         />
                                         {Object.values(textBoxs).filter(item => item.page === currentPage)

@@ -20,5 +20,6 @@ export type TextBoxData = {
     style: React.CSSProperties,
     coordinates: Cordinate
     page: number
-    text: string
+    text: string,
+    tooltip?: string
 }
