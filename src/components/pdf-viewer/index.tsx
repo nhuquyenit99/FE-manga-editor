@@ -26,6 +26,7 @@ export type PDFViewerRef = {
     clear: () => void,
     save: () => void,
     export: (fileName: string, extension: '.jpg' | '.png' | '.pdf') => Promise<void>
+    getDataUrlFromPage: (page: number) => string
 }
 
 export const PDFViewer = forwardRef(({ 
@@ -60,7 +61,8 @@ export const PDFViewer = forwardRef(({
         undo: canvasDrawRef.current?.undo,
         clear: canvasDrawRef.current?.clear,
         save: onSaveData,
-        export: onExport
+        export: onExport,
+        getDataUrlFromPage: getDataUrlFromPage
     }));
 
     const changePage = (offset: number) => {
@@ -83,6 +85,10 @@ export const PDFViewer = forwardRef(({
 
     const nextPage = () =>{
         changePage(1);
+    };
+
+    const getDataUrlFromPage = (page: number) => {
+        return listCanvasUrlRef.current?.[page];
     };
 
     const onSaveData = () => {
@@ -180,7 +186,6 @@ export const PDFViewer = forwardRef(({
                 } finally {
                     setLoadingAll(false);
                 }
-               
             })();
         }
     }, [numPages]);

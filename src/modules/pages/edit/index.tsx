@@ -42,7 +42,7 @@ export const EditPage = () => {
     const [panable, setPanable] = useState(false);
     const [hideDrawInterface, setHideDrawInterface] = useState(panel !== 'erase');
     const [translating, setTranslating] = useState(false);
-    const [translated, setTranslated] = useState(false);
+    // const [translated, setTranslated] = useState(false);
 
     // let canvasDrawRef = null as any;
     const canvasDrawRef = useRef<CanvasDraw | null>(null);
@@ -230,7 +230,7 @@ export const EditPage = () => {
                             </Menu.Item>
                             <Menu.Item key='trans' onClick={() => {
                                 zoomRef.current?.resetTransform();
-                                translate();
+                                translate(currentImage.type === 'application/pdf' ? PDFViewerRef.current?.getDataUrlFromPage(currentPage) : undefined);
                             }} icon={<TranslationOutlined size={16}/>}>
                                 Auto-Translate
                             </Menu.Item>
@@ -350,8 +350,6 @@ export const EditPage = () => {
                                 <h3 style={{ color: 'white', textAlign: 'center', fontFamily: 'Astro-City'}}>Original</h3>
                                 <img src={currentImage.url} alt='raw-page' style={{maxWidth: '400px'}}/>
                             </div> */}
-
-
                             <ExportImageModal 
                                 onSave={async (fileName, extension) => {
                                     if (currentImage.type === 'application/pdf') {

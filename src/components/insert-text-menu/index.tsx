@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import uniqid from 'uniqid';
 import { SketchPicker } from 'react-color';
 import { Button, Select, Popover, InputNumber } from 'antd';
@@ -87,7 +87,7 @@ export const InsertTextPanel = () => {
     const isBold = () => {
         if (activeIds.length === 0) return false;
         for (let id of activeIds) {
-            if (textBoxs[id].style?.fontWeight !== 'bold') {
+            if (textBoxs[id]?.style?.fontWeight !== 'bold') {
                 return false;
             }
         }
@@ -104,7 +104,7 @@ export const InsertTextPanel = () => {
     const isItalic = () => {
         if (activeIds.length === 0) return false;
         for (let id of activeIds) {
-            if (textBoxs[id].style?.fontStyle !== 'italic') {
+            if (textBoxs[id]?.style?.fontStyle !== 'italic') {
                 return false;
             }
         }
@@ -121,7 +121,7 @@ export const InsertTextPanel = () => {
     const isUnderline = () => {
         if (activeIds.length === 0) return false;
         for (let id of activeIds) {
-            if (textBoxs[id].style?.textDecoration !== 'underline') {
+            if (textBoxs[id]?.style?.textDecoration !== 'underline') {
                 return false;
             }
         }
@@ -139,7 +139,7 @@ export const InsertTextPanel = () => {
     const isLineThrough = () => {
         if (activeIds.length === 0) return false;
         for (let id of activeIds) {
-            if (textBoxs[id].style?.textDecoration !== 'line-through') {
+            if (textBoxs[id]?.style?.textDecoration !== 'line-through') {
                 return false;
             }
         }

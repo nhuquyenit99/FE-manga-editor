@@ -3,9 +3,9 @@ import { CloseCircleOutlined } from '@ant-design/icons';
 import { Rnd } from 'react-rnd';
 import { ImageContext } from '../../context';
 import { Cordinate, TextBoxData } from '../../model';
-import './style.scss';
-import { Popconfirm } from 'antd';
+import { Popconfirm, Tooltip } from 'antd';
 import { mergeClass } from '../../utils';
+import './style.scss';
 
 type TextBoxProps = {
     data: TextBoxData
@@ -77,17 +77,27 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
             bounds="parent"
             className={mergeClass('text-input draggable', activeIds.includes(data.id) ? 'active': '')}
         >
-            <div 
-                title={data.tooltip ? `Original: ${data.tooltip}` : ''}
-                style={data.style}
-                className='text-editable' 
-                contentEditable
-                onClick={onClick}
-                onInput={onChangeText} 
-                data-placeholder="Text Box"
-                dangerouslySetInnerHTML={{__html: defaultValue.current}}
-            >
-            </div>
+            <Tooltip title={data.tooltip ? `Original: ${data.tooltip}` : ''}
+                overlayInnerStyle={{
+                    fontSize: '16px'
+                }}
+            > 
+                <div 
+                    style={data.style}
+                    className='text-editable' 
+                    contentEditable
+                    onClick={onClick}
+                    onBlur={() => {
+                        let sel = window.getSelection()!;
+                        sel.removeAllRanges();
+                    }}
+                    onInput={onChangeText} 
+                    data-placeholder="Text Box"
+                    dangerouslySetInnerHTML={{__html: defaultValue.current}}
+                >
+                </div>
+            </Tooltip>
+
             <Popconfirm title="Delete this textbox?" onConfirm={() => removeTextBox(data.id)}
                 okText='Yes'
                 cancelText='No'
