@@ -7,13 +7,13 @@ import {
     faBold, faItalic, faUnderline, faStrikethrough, faFont
 } from '@fortawesome/free-solid-svg-icons';
 
-import { Cordinate, defaultCordinate, defaultTextBoxStyle, ListFontFamily } from '../../model';
+import { defaultCordinate, defaultTextBoxStyle, ListFontFamily } from '../../model';
 import { getColorStrFromRgba, getRgbaFromString, getSizeFromPixel } from '../../utils';
 import { ImageContext } from '../../context';
 import './style.scss';
 
 export const InsertTextPanel = () => {
-    const { activeId, setActiveId, setTextBoxs, textBoxs, currentPage } = useContext(ImageContext);
+    const { activeIds, setTextBoxs, textBoxs, currentPage } = useContext(ImageContext);
 
     const onAddText = () => {
         const id = uniqid();
@@ -33,31 +33,30 @@ export const InsertTextPanel = () => {
                 }
             };
         });
-        setActiveId(id);
     };
 
     const updateActiveTextBoxStyle = (style: React.CSSProperties) => {
-        setTextBoxs(prev => {
-            return {
-                ...prev,
-                [activeId]: {
-                    ...prev[activeId],
-                    style: style
+        let newTextBoxData = {...textBoxs};
+        for (let id of activeIds) {
+            newTextBoxData[id] = {
+                ...newTextBoxData[id],
+                style: {
+                    ...newTextBoxData[id].style,
+                    ...style
                 }
             };
-        });
+        }
+        setTextBoxs(newTextBoxData);
     };
 
     const onSetBackGround = (background?: string) => {
         const newStyle = {
-            ...textBoxs[activeId].style,
             background: background
         };
         updateActiveTextBoxStyle(newStyle);
     };
     const onSetFontSize = (fontSize?: number) => {
         const newStyle = {
-            ...textBoxs[activeId].style,
             fontSize: `${fontSize}px`
         };
         updateActiveTextBoxStyle(newStyle);
@@ -65,7 +64,6 @@ export const InsertTextPanel = () => {
 
     const onSetBorderRadius = (borderRadius?: number) => {
         const newStyle = {
-            ...textBoxs[activeId].style,
             borderRadius: `${borderRadius}px`
         };
         updateActiveTextBoxStyle(newStyle);
@@ -74,7 +72,6 @@ export const InsertTextPanel = () => {
 
     const onSetTextColor = (textColor?: string) => {
         const newStyle = {
-            ...textBoxs[activeId].style,
             color: textColor
         };
         updateActiveTextBoxStyle(newStyle);
@@ -82,40 +79,77 @@ export const InsertTextPanel = () => {
     
     const onSetFontFamily = (fontFamily?: string) => {
         const newStyle = {
-            ...textBoxs[activeId].style,
             fontFamily: fontFamily
         };
         updateActiveTextBoxStyle(newStyle);
     };
 
+    const isBold = () => {
+        if (activeIds.length === 0) return false;
+        for (let id of activeIds) {
+            if (textBoxs[id].style?.fontWeight !== 'bold') {
+                return false;
+            }
+        }
+        return true;
+    };
+
     const onToggleSetTextBold = () => {
         const newStyle = {
-            ...textBoxs[activeId].style,
-            fontWeight: textBoxs[activeId].style?.fontWeight === 'bold' ? 'normal' : 'bold'
+            fontWeight: isBold() ? 'normal' : 'bold'
         };
         updateActiveTextBoxStyle(newStyle);
+    };
+
+    const isItalic = () => {
+        if (activeIds.length === 0) return false;
+        for (let id of activeIds) {
+            if (textBoxs[id].style?.fontStyle !== 'italic') {
+                return false;
+            }
+        }
+        return true;
     };
 
     const onToggleSetTextItalic = () => {
         const newStyle = {
-            ...textBoxs[activeId].style,
-            fontStyle: textBoxs[activeId].style?.fontStyle === 'italic' ? 'normal' : 'italic'
+            fontStyle: isItalic() ? 'normal' : 'italic'
         };
         updateActiveTextBoxStyle(newStyle);
+    };
+
+    const isUnderline = () => {
+        if (activeIds.length === 0) return false;
+        for (let id of activeIds) {
+            if (textBoxs[id].style?.textDecoration !== 'underline') {
+                return false;
+            }
+        }
+        return true;
     };
 
     const onToggleSetTextUnderline = () => {
+
         const newStyle = {
-            ...textBoxs[activeId].style,
-            textDecoration: textBoxs[activeId].style?.textDecoration === 'underline' ?  'none' : 'underline'
+            textDecoration: isUnderline() ?  'none' : 'underline'
         };
         updateActiveTextBoxStyle(newStyle);
     };
 
+    const isLineThrough = () => {
+        if (activeIds.length === 0) return false;
+        for (let id of activeIds) {
+            if (textBoxs[id].style?.textDecoration !== 'line-through') {
+                return false;
+            }
+        }
+        return true;
+    };
+
     const onToggleSetTextLineThrough = () => {
+ 
         const newStyle = {
-            ...textBoxs[activeId].style,
-            textDecoration: textBoxs[activeId].style?.textDecoration === 'line-through' ? 'none' : 'line-through'
+            textDecoration: isLineThrough() ? 'none' : 'line-through'
         };
         updateActiveTextBoxStyle(newStyle);
     };
@@ -135,23 +169,23 @@ export const InsertTextPanel = () => {
                 <h3>Text Style</h3>
                 <div className='style-menu'>
                     <Button className='style-btn' key='bold' 
-                        type={textBoxs[activeId]?.style?.fontWeight === 'bold' ? 'primary' : undefined} 
+                        type={isBold() ? 'primary' : undefined} 
                         onClick={onToggleSetTextBold}>
                         <FontAwesomeIcon icon={faBold}/>
                     </Button>
                     <Button className='style-btn' key='italic'
-                        type={textBoxs[activeId]?.style?.fontStyle === 'italic' ? 'primary' : undefined}
+                        type={isItalic() ? 'primary' : undefined}
                         onClick={onToggleSetTextItalic}>
                         <FontAwesomeIcon icon={faItalic}/>
                     </Button>
                     <Button className='style-btn' key='underline'
-                        type={textBoxs[activeId]?.style?.textDecoration === 'underline' ? 'primary' : undefined}
+                        type={isUnderline() ? 'primary' : undefined}
                         onClick={onToggleSetTextUnderline}
                     >
                         <FontAwesomeIcon icon={faUnderline}/>
                     </Button>
                     <Button className='style-btn' key='line-through'
-                        type={textBoxs[activeId]?.style?.textDecoration === 'line-through' ? 'primary' : undefined}
+                        type={isLineThrough() ? 'primary' : undefined}
                         onClick={onToggleSetTextLineThrough}
                     >
                         <FontAwesomeIcon icon={faStrikethrough}/>
@@ -160,7 +194,7 @@ export const InsertTextPanel = () => {
                 <h3>Font Family</h3>
                 <Select 
                     className='select-font-family'
-                    value={textBoxs[activeId]?.style?.fontFamily}
+                    value={textBoxs[activeIds[0]]?.style?.fontFamily}
                     options={Object.entries(ListFontFamily).map(([key, label]) => {
                         return {
                             label: <div style={{
@@ -179,10 +213,10 @@ export const InsertTextPanel = () => {
                     trigger='click'
                     placement='rightBottom'
                     overlayClassName='pick-color-overlay'
-                    content={<SketchPicker color={getRgbaFromString(textBoxs[activeId]?.style?.color) as any} 
+                    content={<SketchPicker color={getRgbaFromString(textBoxs[activeIds[0]]?.style?.color) as any} 
                         onChange={color => onSetTextColor(getColorStrFromRgba(color.rgb))} width='350px'/>}>
                     <div style={{
-                        background: textBoxs[activeId]?.style.color,
+                        background: textBoxs[activeIds[0]]?.style.color,
                         border: '5px solid white',
                         width: '100px',
                         height: '30px',
@@ -195,10 +229,10 @@ export const InsertTextPanel = () => {
                     trigger='click'
                     placement='rightBottom'
                     overlayClassName='pick-color-overlay'
-                    content={<SketchPicker color={getRgbaFromString(textBoxs[activeId]?.style?.background as any) as any} 
+                    content={<SketchPicker color={getRgbaFromString(textBoxs[activeIds[0]]?.style?.background as any) as any} 
                         onChange={color => onSetBackGround(getColorStrFromRgba(color.rgb))} width='350px'/>}>
                     <div style={{
-                        background: textBoxs[activeId]?.style.background,
+                        background: textBoxs[activeIds[0]]?.style.background,
                         border: '5px solid white',
                         width: '100px',
                         height: '30px',
@@ -209,7 +243,7 @@ export const InsertTextPanel = () => {
                 <h3>Font Size</h3>
                 <div>
                     <InputNumber min={1} 
-                        value={getSizeFromPixel(textBoxs[activeId]?.style?.fontSize as string)}
+                        value={getSizeFromPixel(textBoxs[activeIds[0]]?.style?.fontSize as string)}
                         onChange={onSetFontSize}
                         className='select-font-size'
                     />
@@ -217,7 +251,7 @@ export const InsertTextPanel = () => {
                 <h3>BorderRadius</h3>
                 <div>
                     <InputNumber min={0}
-                        value={getSizeFromPixel(textBoxs[activeId]?.style?.borderRadius as string)}
+                        value={getSizeFromPixel(textBoxs[activeIds[0]]?.style?.borderRadius as string)}
                         onChange={onSetBorderRadius}
                         className='select-font-size'
                     />

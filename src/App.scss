@@ -176,6 +176,14 @@
     font-display: block;
 }
 
+@font-face {
+    font-family: "Roboto";
+    src: url("./assets/fonts/Roboto-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
 /* width */
 ::-webkit-scrollbar {
     width: 10px;

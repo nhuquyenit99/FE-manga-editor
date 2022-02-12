@@ -5,6 +5,7 @@ import { ImageContext } from '../../context';
 import { Cordinate, TextBoxData } from '../../model';
 import './style.scss';
 import { Popconfirm } from 'antd';
+import { mergeClass } from '../../utils';
 
 type TextBoxProps = {
     data: TextBoxData
@@ -12,7 +13,7 @@ type TextBoxProps = {
 }
 
 export const TextBox = ({data, draggable = true}: TextBoxProps) => {
-    const { setActiveId, removeTextBox, setTextBoxs } = useContext(ImageContext);
+    const { setActiveIds, removeTextBox, setTextBoxs, activeIds } = useContext(ImageContext);
     const defaultValue = useRef(data.text);
 
     const onUpdateTextBox = (newData: Cordinate) => {
@@ -41,6 +42,20 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
         });
     };
 
+    const onClick = (e: any) => {
+        e.stopPropagation();
+        if (!activeIds.includes(data.id) && e.ctrlKey) {
+            setActiveIds(prev =>  [...prev, data.id]);
+        } else {
+            setActiveIds([data.id]);
+        }
+        let range = document.createRange();
+        range.selectNodeContents(e.target as any);
+        let sel = window.getSelection()!;
+        sel.removeAllRanges();
+        sel.addRange(range);
+    };
+
     return (
         <Rnd
             default={data.coordinates}
@@ -60,23 +75,16 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
                 });
             }}
             bounds="parent"
-            className='text-input draggable'
+            className={mergeClass('text-input draggable', activeIds.includes(data.id) ? 'active': '')}
         >
             <div 
                 title={data.tooltip ? `Original: ${data.tooltip}` : ''}
                 style={data.style}
                 className='text-editable' 
                 contentEditable
-                onClick={(e) => {
-                    setActiveId(data.id);
-                    let range = document.createRange();
-                    range.selectNodeContents(e.target as any);
-                    let sel = window.getSelection()!;
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }}
+                onClick={onClick}
                 onInput={onChangeText} 
-                data-placeholder="Enter something..."
+                data-placeholder="Text Box"
                 dangerouslySetInnerHTML={{__html: defaultValue.current}}
             >
             </div>

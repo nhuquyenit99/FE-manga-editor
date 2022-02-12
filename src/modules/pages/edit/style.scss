@@ -79,7 +79,7 @@
         overflow: hidden;
 
         .header {
-            height: 61px;
+            height: 58px;
             background: #23262A;
             color: white;
             width: 100%;
@@ -93,7 +93,7 @@
                 text-transform: uppercase;
                 font-size: 30px;
                 font-family: 'Jolly Lodger';
-                line-height: 61px;
+                line-height: 58px;
             }
 
             .ant-btn {
@@ -111,12 +111,16 @@
             flex: 1;
             display: flex;
             height: calc(100vh - 50px);
+            position: relative;
 
             .workspace {
                 padding: 20px;
                 flex: 1;
                 overflow: auto;
                 height: calc(100vh - 61px);
+                // display: grid;
+                // grid-template-columns: 1fr 500px;
+                // column-gap: 20px;
 
                 .image-to-edit {
                     width: fit-content;
@@ -199,5 +203,10 @@
                 }
             }
         }
+    }
+    .dark-loading {
+        background-color: #333;
+        opacity: 0.7;
+        z-index: 3000;
     }
 }

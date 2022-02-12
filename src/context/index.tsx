@@ -12,8 +12,8 @@ type ImageContextState = {
 export const ImageContext = React.createContext({
     currentImage: undefined as ImageContextState|undefined,
     setCurrentImage: (fileData?: ImageContextState) => {},
-    activeId: '',
-    setActiveId: (id: string) => {},
+    activeIds: [] as string[],
+    setActiveIds: (() => {}) as React.Dispatch<React.SetStateAction<string[]>>,
     removeTextBox: (id: string) => {},
     textBoxs: {} as Record<string, TextBoxData>,
     currentPage:  1,
@@ -27,7 +27,7 @@ export function ImageContextProvider ({children}: {children: React.ReactNode}) {
     const [currentImage, setCurrentImage] = useState<ImageContextState>();
 
     const [textBoxs, setTextBoxs] = useState<Record<string, TextBoxData>>({});
-    const [activeTextBox, setActiveTextBox] = useState<string>('');
+    const [activeTextBoxs, setActiveTextBoxs] = useState<string[]>([]);
     const [drawSaveData, setDrawSaveData] = useState<Record<number, string>>({});
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -56,17 +56,18 @@ export function ImageContextProvider ({children}: {children: React.ReactNode}) {
         let list = {...textBoxs};
         delete list[id];
         setTextBoxs(list);
-        if (activeTextBox === id) {
-            setActiveTextBox('');
-        }
+        setActiveTextBoxs(prev => prev.filter(item => item !== id));
+        // if (activeTextBox === id) {
+        //     setActiveTextBox('');
+        // }
     };
 
     return (
         <ImageContext.Provider value={{
             currentImage: currentImage,
             setCurrentImage: updateCurrentImage,
-            activeId: activeTextBox,
-            setActiveId: setActiveTextBox,
+            activeIds: activeTextBoxs,
+            setActiveIds: setActiveTextBoxs,
             removeTextBox: removeTextBox,
             textBoxs: textBoxs,
             currentPage: currentPage,

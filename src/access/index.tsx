@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const CLOUD_NAME = 'doxgeaaoc';
-const BASE_API = 'http://192.168.1.5:8000';
+const BASE_API = 'http://0.0.0.0:8000';
 
 const IMAGEPost = async (data: any) => {
     return await axios({

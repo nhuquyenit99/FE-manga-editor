@@ -28,7 +28,7 @@ export const EditPage = () => {
         currentImage, setCurrentImage, 
         textBoxs, currentPage,
         drawSaveData, setDrawSaveData,
-        setTextBoxs
+        setTextBoxs, setActiveIds
     } = useContext(ImageContext);
 
     let { panel } = useParams<{panel: EditAction}>();
@@ -42,6 +42,7 @@ export const EditPage = () => {
     const [panable, setPanable] = useState(false);
     const [hideDrawInterface, setHideDrawInterface] = useState(panel !== 'erase');
     const [translating, setTranslating] = useState(false);
+    const [translated, setTranslated] = useState(false);
 
     // let canvasDrawRef = null as any;
     const canvasDrawRef = useRef<CanvasDraw | null>(null);
@@ -54,6 +55,12 @@ export const EditPage = () => {
             setHideDrawInterface(true);
         }
     },[panel]);
+
+    // useEffect(() => {
+    //     window.addEventListener('click', (e) => {
+    //         const element = e.AT_TARGET;
+    //     });
+    // },[]);
 
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.pdf') => {
         setHideDrawInterface(true);
@@ -115,7 +122,7 @@ export const EditPage = () => {
 
     const { canvasHeight, canvasWidth } = useImageSize(currentImage?.url ?? '');
 
-    const translate = async () => {
+    const translate = async (url?: string) => {
         if (!currentImage) {
             return ;
         }
@@ -123,7 +130,7 @@ export const EditPage = () => {
             setTranslating(true);
             const res = await DataAccess.translate({
                 file_name: currentImage.original_filename,
-                url: currentImage.url,
+                url: url ?? currentImage.url,
                 page: currentPage
             });
             const listTextBoxs = res?.data as TranslateResponse;
@@ -198,7 +205,6 @@ export const EditPage = () => {
 
     return (
         <div className='edit-page-layout'>
-            {translating && <LoadingFullView />}
             <EditSideBar 
                 action={panel}
             />
@@ -214,7 +220,12 @@ export const EditPage = () => {
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
-                            <Menu.Item key='save' onClick={onSaveData} icon={<SaveOutlined size={16}/>}>
+                            <Menu.Item key='save' onClick={() => {
+                                onSaveData();
+                                notification.success({
+                                    message: 'Saved'
+                                });
+                            }} icon={<SaveOutlined size={16}/>}>
                                 Save
                             </Menu.Item>
                             <Menu.Item key='trans' onClick={() => {
@@ -234,6 +245,7 @@ export const EditPage = () => {
                     </div>
                 </div>
                 <div className='edit-panel-content'>
+                    {translating && <LoadingFullView className='dark-loading'/>}
                     <EraserContext.Provider value={{
                         color: brushColor,
                         setColor: setBrushColor,
@@ -293,7 +305,9 @@ export const EditPage = () => {
                                                         panable ? 'panable': ''
                                                     )}
                                                 >
-                                                    <><div className='image-to-edit' ref={imageRef}>
+                                                    <><div className='image-to-edit' ref={imageRef} onClick={() => {
+                                                        setActiveIds([]);
+                                                    }}>
                                                         <CanvasDraw imgSrc={currentImage.url ?? ''}
                                                             canvasHeight={canvasHeight}
                                                             canvasWidth={canvasWidth}
@@ -327,6 +341,17 @@ export const EditPage = () => {
                                     )}
                                 </TransformWrapper>
                             }
+                            {/* <div style={{
+                                padding: '15px',
+                            }}>
+                                <img src={currentImage.url} alt='raw-page'/>
+                            </div> */}
+                            {/* <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
+                                <h3 style={{ color: 'white', textAlign: 'center', fontFamily: 'Astro-City'}}>Original</h3>
+                                <img src={currentImage.url} alt='raw-page' style={{maxWidth: '400px'}}/>
+                            </div> */}
+
+
                             <ExportImageModal 
                                 onSave={async (fileName, extension) => {
                                     if (currentImage.type === 'application/pdf') {
@@ -339,6 +364,7 @@ export const EditPage = () => {
                             />
                         </div>
                     </EraserContext.Provider>
+
                 </div>
             </div>
         </div>

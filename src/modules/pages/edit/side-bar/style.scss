@@ -5,7 +5,7 @@
     flex-direction: column;
 
     .svg-inline--fa {
-        font-size: 28px;
+        font-size: 25px;
     }
 
     .menu {
@@ -13,9 +13,9 @@
         flex: 1;
 
         .menu-button {
-            padding: 15px;
             display: flex;
             justify-content: center;
+            padding: 10px 12px;
             margin-bottom: 5px;
             color: hsla(0, 0%, 100%, 0.6);
             cursor: pointer;
@@ -37,7 +37,7 @@
         cursor: pointer;
         display: block;
         background: #24262b;
-        padding: 15px;
+        padding: 15px 12px;
         color: hsla(0, 0%, 100%, 0.6);
 
         &:hover {
@@ -46,7 +46,7 @@
     }
 
     .side-bar-upload {
-        padding: 15px;
+        padding: 10px 12px;
         .svg-inline--fa {
             color: hsla(0, 0%, 100%, 0.6);
             cursor: pointer;
