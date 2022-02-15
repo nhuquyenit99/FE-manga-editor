@@ -87,10 +87,10 @@ export const TextBox = ({data, draggable = true}: TextBoxProps) => {
                     className='text-editable' 
                     contentEditable
                     onClick={onClick}
-                    onBlur={() => {
-                        let sel = window.getSelection()!;
-                        sel.removeAllRanges();
-                    }}
+                    // onBlur={() => {
+                    //     let sel = window.getSelection()!;
+                    //     sel.removeAllRanges();
+                    // }}
                     onInput={onChangeText} 
                     data-placeholder="Text Box"
                     dangerouslySetInnerHTML={{__html: defaultValue.current}}
