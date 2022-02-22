@@ -1,6 +1,6 @@
 .pdf-viewer {
-    position: relative;
     min-height: calc(100vh -100px);
+    width: 100%;
 
     .spin-loading {
         margin-top: 50px;
@@ -9,18 +9,17 @@
 
     &:hover {
         .header-tool {
-            display: flex;
+            display: block;
         }
     }
 
     .header-tool {
-        display: none;
-        width: 100%;
-        justify-content: center;
+        // display: none;
         color: #fff;
         margin-bottom: 5px;
         position: absolute;
         top: 10px;
+        left: 1000px;
         z-index: 1000;
 
         .buttonc {
