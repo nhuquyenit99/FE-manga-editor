@@ -1,0 +1,26 @@
+.translate-modal {
+    .text-label {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .ant-modal-title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .ant-modal-header {
+        background-color: #ddd;
+    }
+    .footer {
+        display: flex;
+        justify-content: space-between;
+    }
+    .ant-select {
+        width: 350px;
+        
+    }
+}
+
+.language-key {
+    width: 80px;
+    display: inline-block;
+}

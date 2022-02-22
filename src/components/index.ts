@@ -8,3 +8,7 @@ export { TextBox } from './text-box';
 export { ExportImageModal } from './export-image';
 export { EraseMenu } from './erase-menu';
 export { PDFViewer } from './pdf-viewer';
+export { TranslateModal } from './translate';
+
+export type { TranslateModelRef } from './translate';
+export type { PDFViewerRef } from './pdf-viewer';

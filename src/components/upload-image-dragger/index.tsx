@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
+import uniqid from 'uniqid';
+import { useHistory } from 'react-router-dom';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, notification, Upload } from 'antd';
+import { RcFile } from 'antd/lib/upload';
 import { DataAccess } from '../../access';
 import { ImageContext } from '../../context';
-import { useHistory } from 'react-router-dom';
-import { RcFile } from 'antd/lib/upload';
-import uniqid from 'uniqid';
 
 export const UploadImageDragger = ({type = 'edit'}: {type?: 'edit' | 'translate'}) => {
     const { setCurrentImage, setTextBoxs, setDrawSaveData } = useContext(ImageContext);

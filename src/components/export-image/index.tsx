@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select, Button, notification } from 'antd';
 import { FormInstance } from 'antd/es/form';
 import { LoadingFullView } from '../loading';
 import { ImageContext } from '../../context';
+import './style.scss';
 
 type ExportImageProps = {
     onSave: (fileName: string, extension: '.jpg' | '.png' | '.pdf') => Promise<void>
@@ -18,8 +19,6 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
     const [loading, setLoading] = useState(false);
 
     const { currentImage, currentPage } = useContext(ImageContext);
-    console.log('🚀 ~ file: index.tsx ~ line 21 ~ ExportImageModal ~ currentPage', currentPage);
-    console.log('🚀 ~ file: index.tsx ~ line 21 ~ ExportImageModal ~ currentImage', currentImage);
     const formRef = useRef<FormInstance>(null);
 
     useImperativeHandle(ref, () => ({
@@ -45,7 +44,7 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
     };
 
 
-    const onGenderChange = (value: '.jpg' | '.png' | '.pdf') => {
+    const onExtensionChange = (value: '.jpg' | '.png' | '.pdf') => {
         formRef.current!.setFieldsValue({ extension: value });
     };
 
@@ -55,7 +54,7 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
             className='export-image-modal'
             footer={<div className='footer'>
                 <Button shape='round' onClick={onCloseModal}>Cancel</Button>
-                <Button type='primary' shape='round' onClick={() => formRef.current?.submit()}>Save</Button>
+                <Button type='primary' shape='round' onClick={() => formRef.current?.submit()}>Export</Button>
             </div>}
         >
             <Form className='export-form' ref={formRef} onFinish={onExport}>
@@ -71,7 +70,7 @@ export const ExportImageModal = forwardRef(({onSave}: ExportImageProps, ref) => 
                     <Select
                         placeholder="File Extension"
                         allowClear
-                        onChange={onGenderChange}
+                        onChange={onExtensionChange}
                     >
                         <Select.Option value=".png">.jpg</Select.Option>
                         <Select.Option value=".jpg">.png</Select.Option>

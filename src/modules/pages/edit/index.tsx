@@ -1,25 +1,22 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import CanvasDraw from 'react-canvas-draw';
-import { exportComponentAsPDF, exportComponentAsJPEG, exportComponentAsPNG } from 'react-component-export-image';
-import { Button, Dropdown, Menu, notification, Tooltip } from 'antd';
-import { DownOutlined, ExportOutlined, TranslationOutlined, SaveOutlined } from '@ant-design/icons';
-// import { toJpeg, toPng, toSvg } from 'html-to-image';
-import { Redirect, useHistory, useParams } from 'react-router-dom';
-import { 
-    CropperImagePanel, InsertTextPanel, 
-    UploadImageDragger, TextBox, 
-    ExportImageModal, EraseMenu, PDFViewer, LoadingFullView 
-} from '../../../components';
-import { EraserContext, ImageContext } from '../../../context';
-import { mergeClass, useImageSize } from '../../../utils';
-import { EditSideBar } from './side-bar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHandRock, faMousePointer, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { Redirect, useHistory, useParams } from 'react-router-dom';
+import { Button, Dropdown, Menu, notification, Tooltip } from 'antd';
 import { ReactZoomPanPinchRef, TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
+import { DownOutlined, ExportOutlined, TranslationOutlined, SaveOutlined } from '@ant-design/icons';
+import { exportComponentAsPDF, exportComponentAsJPEG, exportComponentAsPNG } from 'react-component-export-image';
+import { faHandRock, faMousePointer, faSearchMinus, faSearchPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { 
+    TranslateModelRef, PDFViewerRef,
+    CropperImagePanel, InsertTextPanel, 
+    ExportImageModal, EraseMenu, PDFViewer, 
+    UploadImageDragger, TextBox, TranslateModal, 
+} from '../../../components';
+import { EditSideBar } from './side-bar';
+import { mergeClass, useImageSize } from '../../../utils';
+import { EraserContext, ImageContext } from '../../../context';
 import './style.scss';
-import { DataAccess } from '../../../access';
-import { defaultTextBoxStyle, TextBoxData, TranslateResponse } from '../../../model';
-import { PDFViewerRef } from '../../../components/pdf-viewer';
 
 type EditAction = 'crop' | 'text' | 'draw' | 'erase';
 
@@ -28,25 +25,23 @@ export const EditPage = () => {
         currentImage, setCurrentImage, 
         textBoxs, currentPage,
         drawSaveData, setDrawSaveData,
-        setTextBoxs, setActiveIds
+        setActiveIds
     } = useContext(ImageContext);
 
     let { panel } = useParams<{panel: EditAction}>();
     const history = useHistory();
 
     const imageRef = useRef<any>();
-    const saveModelRef = useRef<any>();
+    const exportModelRef = useRef<any>();
     const zoomRef = React.createRef<ReactZoomPanPinchRef>();
+    const canvasDrawRef = useRef<CanvasDraw | null>(null);
+    const PDFViewerRef = useRef<PDFViewerRef>();
+    const translateModalRef = useRef<TranslateModelRef>();
+
     const [brushWidth, setBrushWidth] = useState(10);
     const [brushColor, setBrushColor] = useState('rgba(255,255,255,1)');
     const [panable, setPanable] = useState(false);
     const [hideDrawInterface, setHideDrawInterface] = useState(panel !== 'erase');
-    const [translating, setTranslating] = useState(false);
-    // const [translated, setTranslated] = useState(false);
-
-    // let canvasDrawRef = null as any;
-    const canvasDrawRef = useRef<CanvasDraw | null>(null);
-    const PDFViewerRef = useRef<PDFViewerRef>();
 
     useEffect(() => {
         if (panel === 'erase') {
@@ -55,12 +50,6 @@ export const EditPage = () => {
             setHideDrawInterface(true);
         }
     },[panel]);
-
-    // useEffect(() => {
-    //     window.addEventListener('click', (e) => {
-    //         const element = e.AT_TARGET;
-    //     });
-    // },[]);
 
     const onExport = useCallback(async (fileName: string, extension: '.jpg' | '.png' | '.pdf') => {
         setHideDrawInterface(true);
@@ -98,7 +87,6 @@ export const EditPage = () => {
         const uploadedList = JSON.parse(localStorage.getItem('uploadedList') ?? '{}');
         const newdrawSaveData = canvasDrawRef.current?.getSaveData();
         if (currentImage) {
-            console.log('🚀 ~ file: index.tsx ~ line 95 ~ onSaveData ~ textBoxs', textBoxs);
             const newUploadedList = {
                 ...uploadedList,
                 [currentImage.id]: {
@@ -121,57 +109,6 @@ export const EditPage = () => {
     };
 
     const { canvasHeight, canvasWidth } = useImageSize(currentImage?.url ?? '');
-
-    const translate = async (url?: string) => {
-        if (!currentImage) {
-            return ;
-        }
-        try {
-            setTranslating(true);
-            const res = await DataAccess.translate({
-                file_name: currentImage.original_filename,
-                url: url ?? currentImage.url,
-                page: currentPage
-            });
-            const listTextBoxs = res?.data as TranslateResponse;
-            if (listTextBoxs) {
-                const processedTextBoxs = {} as Record<string, TextBoxData>;
-                listTextBoxs.forEach(item => {
-                    processedTextBoxs[item.id] = {
-                        coordinates: {
-                            x: item.poly.x1 < item.poly.x2 ? item.poly.x1 : item.poly.x2,
-                            y: item.poly.y1 < item.poly.y2 ? item.poly.y1 : item.poly.y2,
-                            width: Math.abs(item.poly.x1 - item.poly.x2),
-                            height: Math.abs(item.poly.y1 - item.poly.y2)
-                        },
-                        id: item.id,
-                        page: item.page,
-                        style: {
-                            ...defaultTextBoxStyle,
-                            fontSize: '12px',
-                            borderRadius: '99px'
-                        },
-                        text: item.translated_text,
-                        tooltip: item.original_text
-                    };
-                });
-                setTextBoxs(processedTextBoxs);
-            }
-            console.log('🚀 ~ file: index.tsx ~ line 116 ~ translate ~ res', res);
-            notification.success({
-                message: 'Translate successfully'
-            });
-        } catch (e) {
-            notification.error({
-                message: 'Translate Failed',
-                description: 'Please try again'
-
-            });
-        } finally {
-            setTranslating(false);
-        }
-
-    };
 
     if (!panel) {
         return <Redirect to='/edit/text'/>;
@@ -216,7 +153,8 @@ export const EditPage = () => {
                         <Dropdown trigger={['click']} overlayClassName='custom-dropdown' overlay={<Menu>
                             <Menu.Item key='export' onClick={() => {
                                 zoomRef.current?.resetTransform();
-                                saveModelRef.current?.open();
+                                setActiveIds([]);
+                                exportModelRef.current?.open();
                             }} icon={<ExportOutlined size={16}/>}>
                                 Export
                             </Menu.Item>
@@ -230,7 +168,14 @@ export const EditPage = () => {
                             </Menu.Item>
                             <Menu.Item key='trans' onClick={() => {
                                 zoomRef.current?.resetTransform();
-                                translate(currentImage.type === 'application/pdf' ? PDFViewerRef.current?.getDataUrlFromPage(currentPage) : undefined);
+                                translateModalRef.current?.open({
+                                    file_name: currentImage.type === 'application/pdf' 
+                                        ? `${currentImage.original_filename}_page${currentPage}` : currentImage.original_filename,
+                                    page: currentPage,
+                                    url: currentImage.type === 'application/pdf' 
+                                        ? (PDFViewerRef.current?.getDataUrlFromPage(currentPage) ?? '') : currentImage.url
+                                });
+                                // translate(currentImage.type === 'application/pdf' ? PDFViewerRef.current?.getDataUrlFromPage(currentPage) : undefined);
                             }} icon={<TranslationOutlined size={16}/>}>
                                 Auto-Translate
                             </Menu.Item>
@@ -245,7 +190,6 @@ export const EditPage = () => {
                     </div>
                 </div>
                 <div className='edit-panel-content'>
-                    {translating && <LoadingFullView className='dark-loading'/>}
                     <EraserContext.Provider value={{
                         color: brushColor,
                         setColor: setBrushColor,
@@ -341,15 +285,6 @@ export const EditPage = () => {
                                     )}
                                 </TransformWrapper>
                             }
-                            {/* <div style={{
-                                padding: '15px',
-                            }}>
-                                <img src={currentImage.url} alt='raw-page'/>
-                            </div> */}
-                            {/* <div style={{display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-                                <h3 style={{ color: 'white', textAlign: 'center', fontFamily: 'Astro-City'}}>Original</h3>
-                                <img src={currentImage.url} alt='raw-page' style={{maxWidth: '400px'}}/>
-                            </div> */}
                             <ExportImageModal 
                                 onSave={async (fileName, extension) => {
                                     if (currentImage.type === 'application/pdf') {
@@ -358,11 +293,11 @@ export const EditPage = () => {
                                         await onExport(fileName, extension);
                                     }
                                 }}
-                                ref={saveModelRef}
+                                ref={exportModelRef}
                             />
                         </div>
                     </EraserContext.Provider>
-
+                    <TranslateModal ref={translateModalRef} />
                 </div>
             </div>
         </div>

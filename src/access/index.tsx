@@ -18,7 +18,8 @@ const IMAGEPost = async (data: any) => {
 type ImageData = {
     page: number,
     url: string,
-    file_name: string
+    file_name: string,
+    lang: string
 }
 
 const APItranslate = async (data: ImageData) => {
